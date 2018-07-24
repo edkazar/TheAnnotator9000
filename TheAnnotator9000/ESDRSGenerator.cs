@@ -14,7 +14,6 @@ namespace TheAnnotator9000
         public int arity; // Number of elements of the predicate
         public List<Variable> variables; // Variables referenced by the predicate
         public List<Mapping> virtualMappings; // Virtual mapping the predicate can refer to
-        public int index; // Index in the list it belongs. For ease purposes, not part of structure
     }
 
     public struct Variable
@@ -23,23 +22,22 @@ namespace TheAnnotator9000
         public string type; // Individual or Eventuality
         public TimeSpan initialTime; // For eventuality variables, point in time when event starts
         public TimeSpan finalTime; // For eventuality variables, point in time when event finishes
-        public int index; // Index in the list it belongs. For ease purposes, not part of structure
     }
 
     public struct Mapping
     {
+        public string name; // For ease purposes, not part of structure
         public Matrix3D transformation; // Geometric transformation matrix from physical to virtual space
         public Spatiotemporal physicalLocation; // Physical location in time
-        public int index; // Index in the list it belongs. For ease purposes, not part of structure
     }
 
     public struct Spatiotemporal
     {
+        public string name; // For ease purposes, not part of structure
         public int posX; // Physical X-axis coordinate
         public int posY; // Physical Y-axis coordinate
         public int posZ; // Physical Z-axis coordinate
         public TimeSpan time; // Moment in time when the coordinate resides
-        public int index; // Index in the list it belongs. For ease purposes, not part of structure
     }
 
     public struct GestureShape
@@ -64,6 +62,7 @@ namespace TheAnnotator9000
 
     public struct GestureAnnotation //ID of gesture will be the name of the JSON file
     {
+        public string name; // For ease purposes, not part of structure
         public List<Variable> Variables; // Variables created or used by the gesture
         public List<Predicate> TaxClass; // Taxonomy class of the gesture
         public List<GestureShape> Shape; // Struct describing the gesture's shape
@@ -73,7 +72,6 @@ namespace TheAnnotator9000
         public Predicate Loc; // Spatiotemporal information of the gesture
         public List<Predicate> Exemplifies; // Semantic concepts described by the gesture
         public List<Predicate> ExtraPredicates; // For extra predicates
-        public int index; // Index in the list it belongs. For ease purposes, not part of structure
     };
 
     class ESDRSGenerator
@@ -93,9 +91,7 @@ namespace TheAnnotator9000
             g_Mappings = new Dictionary<string, Mapping>();
             g_Spatiotemporals = new Dictionary<string, Spatiotemporal>();
             g_Predicates = new Dictionary<string, Predicate>();
-
             g_GestureAnnotations = new List<GestureAnnotation>();
-
         }
 
         public string createVariable(string pName, string pType, TimeSpan pInitialTime, TimeSpan pFinalTime)
@@ -108,12 +104,10 @@ namespace TheAnnotator9000
 
             if (pType == "Individual")
             {
-                variable.index = g_IndividualVariables.Count;
                 g_IndividualVariables.Add(pName, variable);
             }
             else
             {
-                variable.index = g_EventualityVariables.Count;
                 g_EventualityVariables.Add(pName, variable);
             }
 
@@ -151,10 +145,40 @@ namespace TheAnnotator9000
 
             predicate.variables = tempVariables;
             predicate.virtualMappings = tempVirtualMappings;
-            predicate.index = g_Predicates.Count;
             g_Predicates.Add(pName, predicate);
 
             return predicate.name;
+        }
+
+        public string createSpatiotemporal(string pName, int pPosX, int pPosY, int pPosZ, TimeSpan pTime)
+        {
+            Spatiotemporal tempSpatiotemporal;
+
+            tempSpatiotemporal.name = pName;
+            tempSpatiotemporal.posX = pPosX;
+            tempSpatiotemporal.posY = pPosY;
+            tempSpatiotemporal.posZ = pPosZ;
+            tempSpatiotemporal.time = pTime;
+
+            g_Spatiotemporals.Add(pName, tempSpatiotemporal);
+
+            return tempSpatiotemporal.name;
+        }
+
+        public string createMapping(string pName, Matrix3D pMatrix, string pSpatiotemporal)
+        {
+            Mapping tempMapping;
+
+            tempMapping.name = pName;
+            tempMapping.transformation = pMatrix;
+
+            Spatiotemporal tempSpatiotemporal;
+            g_Spatiotemporals.TryGetValue(pSpatiotemporal, out tempSpatiotemporal);
+            tempMapping.physicalLocation = tempSpatiotemporal;
+
+            g_Mappings.Add(pName, tempMapping);
+
+            return tempMapping.name;
         }
     }
 }
