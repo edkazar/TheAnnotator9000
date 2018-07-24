@@ -30,63 +30,19 @@ namespace TheAnnotator9000
     /// </summary>
     /// 
 
-    public struct Predicate
-    {
-        public string name;
-        public List<string> sort;
-        public int arity;
-        public List<Variable> variables;
-    }
-
-    public struct Variable
-    {
-        public string name;
-        public string type;
-    }
-
-    public struct GestureShape
-    {
-        public List<Variable> Variables; // Variables created or used by the gesture
-        public List<Predicate> Component; // For dependences bewteen body parts
-        public List<Predicate> Pose; // Whether the body part is extended or not
-        public List<Predicate> Orientation; // Position towards where the body part is facing
-        public List<Predicate> Separated; // Whether the body part is separated (usually for fingers)
-        public List<Predicate> ExtraPredicates; // For extra predicates
-    };
-
-    public struct GestureMovement
-    {
-        public List<Variable> Variables; // Variables created or used by the gesture
-        public Predicate InitialPoint; // Initial point of the trajectory
-        public Predicate TransitionPoint; // Transition point of the trajectory
-        public Predicate FinalPoint; // Finial point of the trajectory
-        public List<Predicate> Plane; // Planes of motion
-        public List<Predicate> Trajectory; // Name of the icon annotation
-    };
-
-    public struct GestureAnnotation //ID of gesture will be the name of the JSON file
-    {
-        public List<Variable> Variables; // Variables created or used by the gesture
-        public List<Predicate> TaxClass; // Taxonomy class of the gesture
-        public List<GestureShape> Shape; // Struct describing the gesture's shape
-        public Predicate Dependence; // Whether or not there is a dependence between hands
-        public List<GestureMovement> Movement; // Struct describing the gesture's movement
-        public Predicate Synchro; // Whether or not the gesture is synchronized with an event
-        public Predicate Loc; // Spatiotemporal information of the gesture
-        public List<Predicate> Exemplifies; // Semantic concepts described by the gesture
-        public List<Predicate> ExtraPredicates; // For extra predicates
-    };
+    
 
     public sealed partial class MainPage : Page
     {
+        private Type g_VariableType;
+        private Type g_PredicateType;
+        private Type g_MappingType;
+        private Type g_SpatiotemporalType;
+
         private JArray g_GestureDatabase;
         private StorageFolder g_RootFolder;
         private MediaPlayer g_MediaPlayer;
-
-        private List<Variable> g_IndividualVariables;
-        private List<Variable> g_EventualityVariables;
-        private List<Predicate> g_Predicates;
-       
+    
         private int g_GestureCounter;
         private string currentArm;
 
@@ -98,6 +54,12 @@ namespace TheAnnotator9000
         public MainPage()
         {
             this.InitializeComponent();
+
+            g_VariableType = typeof(Variable);
+            g_PredicateType = typeof(Predicate);
+            g_MappingType = typeof(Mapping);
+            g_SpatiotemporalType = typeof(Spatiotemporal);
+
             GreetingMessageText.Visibility = Visibility.Visible;
             UsernameTextbox.Visibility = Visibility.Visible;
             PasswordTextbox.Visibility = Visibility.Visible;
@@ -116,10 +78,6 @@ namespace TheAnnotator9000
             g_MediaPlayer.IsLoopingEnabled = true;
 
             g_GestureCounter = 0;
-
-            g_IndividualVariables = new List<Variable>();
-            g_EventualityVariables = new List<Variable>();
-            g_Predicates = new List<Predicate>();
 
             currentArm = "";
 
@@ -247,19 +205,21 @@ namespace TheAnnotator9000
             {
                 if (obj.GetType() == typeof(ToggleButton))
                 {
+                    Debug.WriteLine(obj.GetType().ToString());
+                    Debug.WriteLine(typeof(ToggleButton).ToString());
                     ToggleButton thisButton = (ToggleButton)obj;
                     if (thisButton.IsChecked == true)
                     {
                         if(thisButton.Content.ToString() != "Gesture")
                         {
-                            List<Variable> gestVar = new List<Variable>();
+                            /*List<Variable> gestVar = new List<Variable>();
                             gestVar.Add(g_IndividualVariables[g_IndividualVariables.Count - 1]);
-                            g_Predicates.Add(createPredicate(thisButton.Content.ToString(), gestVar));
+                            g_Predicates.Add(createPredicate(thisButton.Content.ToString(), gestVar));*/
                         }
                         else
                         {
-                            createIndividualVariable("Var" + g_GestureCounter.ToString());
-                            g_GestureCounter++;
+                            /*createIndividualVariable("Var" + g_GestureCounter.ToString());
+                            g_GestureCounter++;*/
                         }
                     }
                 }
@@ -272,33 +232,7 @@ namespace TheAnnotator9000
             currentArm = "Right";
         }
 
-        private Variable createIndividualVariable(string pName)
-        {
-            Variable variable;
-            variable.name = pName;
-            variable.type = "Individual";
-            g_IndividualVariables.Add(variable);
-            IndVarComboBox.Items.Add(pName);
-            return variable;
-        }
-
-        private Predicate createPredicate(string pName, List<Variable> pVars)
-        {
-            Predicate predicate;
-            predicate.name = pName;
-            predicate.arity = pVars.Count;
-            predicate.variables = pVars;
-
-            List<string> sort = new List<string>();
-
-            foreach(Variable var in pVars)
-            {
-                sort.Add(var.type);
-            }
-            predicate.sort = sort;
-
-            return predicate;
-        }
+        
 
         private void ShapeCreationButton_Click(object sender, RoutedEventArgs e)
         {
