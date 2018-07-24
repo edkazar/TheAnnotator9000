@@ -1,0 +1,161 @@
+﻿<Page
+    x:Class="TheAnnotator9000.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:TheAnnotator9000"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Grid>
+        <TextBlock x:Name="GreetingMessageText" HorizontalAlignment="Center" Margin="0,155,0,0" Text="Welcome to the Annotator 9000" TextWrapping="Wrap" FontSize="110" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
+        <TextBox x:Name="UsernameTextbox" Height="16" Margin="0,443,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Username" HorizontalAlignment="Center" Width="215" Visibility="Collapsed"/>
+        <PasswordBox x:Name="PasswordTextbox" Height="34" Margin="0,563,0,0" VerticalAlignment="Top" PlaceholderText="Password" HorizontalAlignment="Center" Width="210" Visibility="Collapsed"/>
+        <Button x:Name="ButtonLogin" Content="Login" HorizontalAlignment="Center" Margin="0,664,0,0" VerticalAlignment="Top" Height="63" Width="209" FontSize="24" Click="ButtonLogin_Click" Visibility="Collapsed"/>
+
+        <TextBox x:Name="GestureIDTextbox" Height="16" Margin="265,155,0,0" Text="" VerticalAlignment="Top" PlaceholderText="GestureID" HorizontalAlignment="Left" Width="215" Visibility="Collapsed"/>
+        <Button x:Name="GestureIDButton" Content="Select" HorizontalAlignment="Left" Margin="121,155,0,0" VerticalAlignment="Top" Height="32" Width="105" Click="GestureIDButton_Click" Visibility="Collapsed"/>
+        <TextBlock x:Name="ErrorMessageText" HorizontalAlignment="Left" Margin="173,206,0,0" Text="No Gesture Found with Specified ID" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
+        <TextBlock x:Name="GestureIDTextInstruction1" HorizontalAlignment="Left" Margin="121,80,0,0" Text="Remember GestureID = WXYZ" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
+        <TextBlock x:Name="GestureIDTextInstruction2" HorizontalAlignment="Left" Margin="358,56,0,0" Text="W = Experiment Number" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Collapsed"/>
+        <TextBlock x:Name="GestureIDTextInstruction3" HorizontalAlignment="Left" Margin="358,76,0,0" Text="X = Agent Type (1 = W, 2 = H)" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Collapsed"/>
+        <TextBlock x:Name="GestureIDTextInstruction4" HorizontalAlignment="Left" Margin="358,96,0,0" Text="Y = Participant Number" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Collapsed"/>
+        <TextBlock x:Name="GestureIDTextInstruction5" HorizontalAlignment="Left" Margin="358,115,0,0" Text="Z = Gesture Number" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Collapsed"/>
+
+        <TextBlock x:Name="GestureIDText" HorizontalAlignment="Left" Margin="728,78,0,0" Text="Gesture ID = " FontSize="48" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontFamily="Segoe UI" Visibility="Collapsed"/>
+        <MediaPlayerElement x:Name="GestureRecording" AreTransportControlsEnabled="False" Margin="1296,308,44,296" FontFamily="Segoe UI" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+        <TextBlock x:Name="SpeechTranscriptionText" HorizontalAlignment="Left" Margin="1296,789,0,0" FontSize="36" TextWrapping="Wrap" VerticalAlignment="Top" Width="580" Height="174" FontFamily="Segoe UI" Visibility="Collapsed"/>
+
+        <Grid x:Name="TaxonomyAnnotatorGrid" Visibility="Collapsed">
+            <ToggleButton Content="Gesture" HorizontalAlignment="Left" Height="47" Margin="552,397,0,0" VerticalAlignment="Top" Width="179" FontFamily="Segoe UI" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16"/>
+            <ToggleButton Content="Characteristics" HorizontalAlignment="Left" Height="47" Margin="54,750,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Communicative" HorizontalAlignment="Left" Height="47" Margin="144,486,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Manipulative" HorizontalAlignment="Left" Height="47" Margin="417,486,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Butterworths" HorizontalAlignment="Left" Height="47" Margin="683,486,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Regulators" HorizontalAlignment="Left" Height="47" Margin="948,486,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Symbolic" HorizontalAlignment="Left" Height="47" Margin="30,574,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Representational" HorizontalAlignment="Left" Height="47" Margin="252,574,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Deictic" HorizontalAlignment="Left" Height="47" Margin="476,574,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Beats" HorizontalAlignment="Left" Height="47" Margin="841,574,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Semaphoric" HorizontalAlignment="Left" Height="47" Margin="1052,574,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Iconic" HorizontalAlignment="Left" Height="47" Margin="152,662,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Metaphoric" HorizontalAlignment="Left" Height="47" Margin="361,662,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Symbiotic" HorizontalAlignment="Left" Height="47" Margin="579,662,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Transformative" HorizontalAlignment="Left" Height="47" Margin="779,662,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Actions" HorizontalAlignment="Left" Height="47" Margin="252,750,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Function" HorizontalAlignment="Left" Height="47" Margin="463,750,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Cause-Effect" HorizontalAlignment="Left" Height="47" Margin="665,750,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Prototype" HorizontalAlignment="Left" Height="47" Margin="865,750,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Opposition" HorizontalAlignment="Left" Height="47" Margin="1071,750,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Agent's" HorizontalAlignment="Left" Height="47" Margin="144,839,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Referent's" HorizontalAlignment="Left" Height="47" Margin="361,839,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Cause-of-Referent" HorizontalAlignment="Left" Height="47" Margin="579,839,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Effect-of-Referent" HorizontalAlignment="Left" Height="47" Margin="781,839,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <ToggleButton Content="Source-of-Referent" HorizontalAlignment="Left" Height="47" Margin="981,839,0,0" VerticalAlignment="Top" Width="179" FontFamily="Arial Black" Background="#FF4DC599" Foreground="White" FontWeight="Bold" FontSize="16" Checked="ToggleButton_Checked"/>
+            <Button x:Name="TaxonomyDoneButton" Content="Done Annotating" HorizontalAlignment="Left" Margin="568,965,0,0" VerticalAlignment="Top" Height="56" Width="148" FontWeight="Bold" FontSize="16" Click="TaxButton_Click"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="644,444,644,464,234,464,234,486"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="644,444,644,464,507,464,507,486"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="644,444,644,464,775,464,775,486"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="644,444,644,464,1040,464,1040,486"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="234,533,234,553,124,553,124,574"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="234,533,234,553,347,553,347,574"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="234,533,234,553,570,553,570,574"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="1040,533,1040,553,930,553,930,574"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="1040,533,1040,553,1145,553,1145,574"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="347,621,347,643,243,643,243,663"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="347,621,347,643,450,643,450,663"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="570,621,570,643,670,643,670,663"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="570,621,570,643,870,643,870,663"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="243,710,243,730,145,730,145,750"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="243,710,243,730,342,730,342,750"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="450,710,450,730,555,730,555,750"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="450,710,450,730,755,730,755,750"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="450,710,450,730,955,730,955,750"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="450,710,450,730,1160,730,1160,750"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="342,798,342,818,237,818,237,838"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="342,798,342,818,450,818,450,838"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="755,798,755,818,670,818,670,840"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="755,798,755,818,870,818,870,840"/>
+            <Polyline Stroke="DeepPink" StrokeThickness="5" Points="755,798,755,818,1070,818,1070,840"/>
+            <TextBlock HorizontalAlignment="Left" Margin="476,277,0,0" Text="Select all that apply" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontSize="36"/>
+        </Grid>
+
+        <Grid x:Name="ShapeAnnotatorGrid">
+            <TextBlock x:Name="RightArmText" HorizontalAlignment="Left" Margin="322,254,0,0" Text="Is Right Arm Being Used?" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="LeftArmText" HorizontalAlignment="Left" Margin="322,254,0,0" Text="Is Left Arm Being Used?" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="YesButton" Content="Yes" HorizontalAlignment="Left" Margin="289,337,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="ShapeCreationButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="NoButton" Content="No" HorizontalAlignment="Left" Margin="511,337,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="ShapeCreationButton_Click" Visibility="Collapsed"/>
+            <TextBlock x:Name="ArmPoseText" HorizontalAlignment="Left" Margin="322,440,0,0" Text="Describe the arm's shape" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="HandPoseText" HorizontalAlignment="Left" Margin="322,440,0,0" Text="Describe the hand's shape" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="ExtendedPoseButton" Content="Extended" HorizontalAlignment="Left" Margin="175,0,0,0" VerticalAlignment="Center" Height="57" Width="158" FontSize="24" Click="PoseButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="SemiExtendedPoseButton" Content="Semi-Extended" HorizontalAlignment="Left" Margin="368,0,0,0" VerticalAlignment="Center" Height="57" Width="191" FontSize="24" Click="PoseButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="NoExtendedPoseButton" Content="Not Extended" HorizontalAlignment="Left" Margin="590,0,0,0" VerticalAlignment="Center" Height="57" Width="179" FontSize="24" Click="PoseButton_Click" Visibility="Collapsed"/>
+            <TextBlock x:Name="ArmOrientationText" HorizontalAlignment="Left" Margin="283,440,0,0" Text="Describe the arm's orientation" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="HandOrientationText" HorizontalAlignment="Left" Margin="272,440,0,0" Text="Describe the hand's orientation" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="UpOrientationButton" Content="Up" HorizontalAlignment="Left" Margin="175,0,0,0" VerticalAlignment="Center" Height="57" Width="158" FontSize="24" Click="OrientationButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="DownOrientationButton" Content="Down" HorizontalAlignment="Left" Margin="368,0,0,0" VerticalAlignment="Center" Height="57" Width="191" FontSize="24" Click="OrientationButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="LeftOrientationButton" Content="Left" HorizontalAlignment="Left" Margin="590,0,0,0" VerticalAlignment="Center" Height="57" Width="179" FontSize="24" Click="OrientationButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="RightOrientationButton" Content="Right" HorizontalAlignment="Left" Margin="289,599,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OrientationButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="ForwardOrientationButton" Content="Forward" HorizontalAlignment="Left" Margin="478,599,0,0" VerticalAlignment="Top" Height="57" Width="191" FontSize="24" Click="OrientationButton_Click" Visibility="Collapsed"/>
+
+            <Grid x:Name="FingerDescriptionGrid">
+                <TextBlock x:Name="FingerDescriptionText" HorizontalAlignment="Left" Margin="371,252,0,0" Text="Describe the fingers' pose" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26" FontWeight="Bold" Visibility="Collapsed"/>
+                <TextBlock x:Name="LittleFingerText" HorizontalAlignment="Left" Margin="84,334,0,0" Text="Little Finger" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+                <TextBlock x:Name="RingFingerText" HorizontalAlignment="Left" Margin="84,396,0,0" Text="Ring Finger" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+                <TextBlock x:Name="MiddleFingerText" HorizontalAlignment="Left" Margin="84,455,0,0" Text="Middle Finger" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+                <TextBlock x:Name="IndexFingerText" HorizontalAlignment="Left" Margin="84,512,0,0" Text="Index Finger" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+                <TextBlock x:Name="ThumbFingerText" HorizontalAlignment="Left" Margin="84,570,0,0" Text="Thumb Finger" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+                <Button x:Name="FingerExtendedPoseButton" Content="Extended" HorizontalAlignment="Left" Margin="289,323,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="FingerPoseButton_Click" Visibility="Collapsed"/>
+                <Button x:Name="FingerSemiExtendedPoseButton" Content="Semi-Extended" HorizontalAlignment="Left" Margin="482,323,0,0" VerticalAlignment="Top" Height="57" Width="191" FontSize="24" Click="FingerPoseButton_Click" Visibility="Collapsed"/>
+                <Button x:Name="FingerNoExtendedPoseButton" Content="Not Extended" HorizontalAlignment="Left" Margin="704,323,0,0" VerticalAlignment="Top" Height="57" Width="179" FontSize="24" Click="FingerPoseButton_Click" Visibility="Collapsed"/>
+                <TextBlock x:Name="FingerOrientationText" HorizontalAlignment="Left" Margin="386,413,0,0" Text="Describe the fingers' orientation" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26" FontWeight="Bold" Visibility="Collapsed"/>
+                <Button x:Name="FingerUpOrientationButton" Content="Up" HorizontalAlignment="Left" Margin="289,483,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="FingerOrientationButton_Click" Visibility="Collapsed"/>
+                <Button x:Name="FingerDownOrientationButton" Content="Down" HorizontalAlignment="Left" Margin="482,483,0,0" VerticalAlignment="Top" Height="57" Width="191" FontSize="24" Click="FingerOrientationButton_Click" Visibility="Collapsed"/>
+                <Button x:Name="FingerLeftOrientationButton" Content="Left" HorizontalAlignment="Left" Margin="704,483,0,0" VerticalAlignment="Top" Height="57" Width="179" FontSize="24" Click="FingerOrientationButton_Click" Visibility="Collapsed"/>
+                <Button x:Name="FingerRightOrientationButton" Content="Right" HorizontalAlignment="Left" Margin="715,570,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="FingerOrientationButton_Click" Visibility="Collapsed"/>
+                <Button x:Name="FingerNoOrientationButton" Content="N/A" HorizontalAlignment="Left" Margin="289,570,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="FingerOrientationButton_Click" Visibility="Collapsed"/>
+                <Button x:Name="FingerForwardOrientationButton" Content="Forward" HorizontalAlignment="Left" Margin="482,570,0,0" VerticalAlignment="Top" Height="57" Width="191" FontSize="24" Click="FingerOrientationButton_Click" Visibility="Collapsed"/>
+                <TextBlock x:Name="FingerSeparationText" HorizontalAlignment="Left" Margin="368,252,0,0" Text="Describe the fingers' separation" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26" FontWeight="Bold" Visibility="Collapsed"/>
+                <ToggleSwitch x:Name="LittleFingerSwitch" Header="Connected to" OffContent="Separated" OnContent="Ring Finger" HorizontalAlignment="Left" Margin="485,348,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+                <ToggleSwitch x:Name="RingFingerSwitch" Header="Connected to" OffContent="Separated" OnContent="Middle Finger" HorizontalAlignment="Left" Margin="485,408,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+                <ToggleSwitch x:Name="MiddleFingerSwitch" Header="Connected to" OffContent="Separated" OnContent="Index Finger" HorizontalAlignment="Left" Margin="485,469,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+                <ToggleSwitch x:Name="IndexFingerSwitch" Header="Connected to" OffContent="Separated" OnContent="Thumb Finger" HorizontalAlignment="Left" Margin="485,530,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+                <Button x:Name="DoneSeparatingButton" Content="Done Separating" HorizontalAlignment="Left" Margin="475,664,0,0" VerticalAlignment="Top" Height="57" Width="206" FontSize="24" Click="DoneWithFingersButton_Click" Visibility="Collapsed"/>
+            </Grid>
+
+            <Button x:Name="ShapeDoneButton" Content="Done Shaping" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="148" FontWeight="Bold" FontSize="16" Click="ShapeDoneButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="AnotherShapeButton" Content="Add Another Shape" HorizontalAlignment="Left" Margin="198,947,0,0" VerticalAlignment="Top" Height="56" Width="178" FontWeight="Bold" FontSize="16" Click="AnotherShapeButton_Click" Visibility="Collapsed"/>
+        </Grid>
+
+        <Grid x:Name="TrajectoryAnnotatorGrid">
+            <TextBlock x:Name="RightPlaceholdersText" HorizontalAlignment="Left" Margin="322,254,0,0" Text="How many motion placeholders&#x0a;does the right hand gesture have?&#x0a;(Include initial and end points)" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="LeftPlaceholdersText" HorizontalAlignment="Left" Margin="322,254,0,0" Text="How many motion placeholders&#x0a;does the left hand gesture have?&#x0a;(Include initial and end points)" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBox x:Name="NumPlaceholdersTextbox" Height="16" Margin="349,379,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Insert Num of Placeholders" HorizontalAlignment="Left" Width="215" Visibility="Collapsed"/>
+            <Button x:Name="DoneNumPlaceholdersButton" Content="Done" HorizontalAlignment="Left" Margin="623,379,0,0" VerticalAlignment="Top" Width="72" Click="DoneNumPlaceholdersButton_Click" Visibility="Collapsed"/>
+            <TextBlock x:Name="ErrorTrajectoryMessageText" HorizontalAlignment="Left" Margin="415,430,0,0" Text="Please enter a valid number" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
+            <Image x:Name="MotionPlanesImage" HorizontalAlignment="Center" Height="302" Margin="0,474,0,0" VerticalAlignment="Top" Width="304" Source="Assets/body-planes.png" Visibility="Collapsed"/>
+            <TextBlock x:Name="DescribePlaneOfMotion" HorizontalAlignment="Left" Margin="321,484,0,0" Text="Select the main plane of motion" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="MotionSagittalButton" Content="Sagittal" HorizontalAlignment="Left" Margin="333,542,0,0" VerticalAlignment="Top" Click="MotionOptionButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="MotionCoronalButton" Content="Coronal" HorizontalAlignment="Left" Margin="623,542,0,0" VerticalAlignment="Top" Click="MotionOptionButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="MotionTransverseButton" Content="Transverse" HorizontalAlignment="Left" Margin="468,542,0,0" VerticalAlignment="Top" Click="MotionOptionButton_Click" Visibility="Collapsed"/>
+            <TextBlock x:Name="DescribeTrajectoryText" HorizontalAlignment="Left" Margin="309,642,0,0" Text="With respect to the coronal plane,&#x0a;Select all that apply for the&#x0a;trajectory of motion #0" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Grid x:Name="MotionDirectionsGrid" Visibility="Collapsed">
+                <ToggleButton x:Name="UpMotionToggleButton" Content="Up" HorizontalAlignment="Left" Margin="383,806,0,0" VerticalAlignment="Top" Width="118"/>
+                <ToggleButton x:Name="IterativepMotionToggleButton" Content="Iterative" HorizontalAlignment="Left" Margin="383,854,0,0" VerticalAlignment="Top" Width="118"/>
+                <ToggleButton x:Name="DownMotionToggleButton" Content="Down" HorizontalAlignment="Left" Margin="383,904,0,0" VerticalAlignment="Top" Width="118"/>
+                <ToggleButton x:Name="BackwardMotionToggleButton" Content="Backward" HorizontalAlignment="Left" Margin="229,782,0,0" VerticalAlignment="Top" Width="118"/>
+                <ToggleButton x:Name="LeftpMotionToggleButton" Content="Left" HorizontalAlignment="Left" Margin="247,854,0,0" VerticalAlignment="Top" Width="118"/>
+                <ToggleButton x:Name="ClockwisepMotionToggleButton" Content="Clockwise" HorizontalAlignment="Left" Margin="229,924,0,0" VerticalAlignment="Top" Width="118"/>
+                <ToggleButton x:Name="ForwardMotionToggleButton" Content="Forward" HorizontalAlignment="Left" Margin="542,782,0,0" VerticalAlignment="Top" Width="118"/>
+                <ToggleButton x:Name="RightpMotionToggleButton" Content="Right" HorizontalAlignment="Left" Margin="520,854,0,0" VerticalAlignment="Top" Width="118"/>
+                <ToggleButton x:Name="AntiClockwiseMotionToggleButton" Content="Anti-Clockwise" HorizontalAlignment="Left" Margin="537,924,0,0" VerticalAlignment="Top"/>
+                <ToggleButton x:Name="StaticMotionToggleButton" Content="Static" HorizontalAlignment="Left" Margin="697,854,0,0" VerticalAlignment="Top" Width="118"/>
+                <Button x:Name="DoneMotioningButton" Content="Done motioning" HorizontalAlignment="Left" Margin="692,973,0,0" VerticalAlignment="Top"  Click="DoneMotioningOptionButton_Click"/>
+            </Grid>
+            <Button x:Name="DoneTrajectoryButton" Content="Done Trajectoring" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="155" FontWeight="Bold" FontSize="16" Click="DoneTrajectoringButton_Click" Visibility="Collapsed"/>
+        </Grid>
+
+        <ComboBox x:Name="IndVarComboBox" Header="Individual Variables" Height="59" Width="341" HorizontalAlignment="Left" Margin="915,338,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+    </Grid>
+</Page>
