@@ -24,6 +24,8 @@
         <TextBlock x:Name="GestureIDTextInstruction5" HorizontalAlignment="Left" Margin="358,115,0,0" Text="Z = Gesture Number" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Collapsed"/>
 
         <TextBlock x:Name="GestureIDText" HorizontalAlignment="Left" Margin="728,78,0,0" Text="Gesture ID = " FontSize="48" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontFamily="Segoe UI" Visibility="Collapsed"/>
+        <TextBlock x:Name="RightText" HorizontalAlignment="Left" Margin="1314,235,0,0" Text="RIGHT" FontSize="48" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontFamily="Segoe UI" Foreground="#FF0F19EE" Visibility="Collapsed"/>
+        <TextBlock x:Name="LeftText" HorizontalAlignment="Left" Margin="1750,235,0,0" Text="LEFT" FontSize="48" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" FontFamily="Segoe UI" Foreground="#FFF01616" Visibility="Collapsed"/>
         <MediaPlayerElement x:Name="GestureRecording" AreTransportControlsEnabled="False" Margin="1296,308,44,296" FontFamily="Segoe UI" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
         <TextBlock x:Name="SpeechTranscriptionText" HorizontalAlignment="Left" Margin="1296,789,0,0" FontSize="36" TextWrapping="Wrap" VerticalAlignment="Top" Width="580" Height="174" FontFamily="Segoe UI" Visibility="Collapsed"/>
 
@@ -124,6 +126,10 @@
                 <Button x:Name="DoneSeparatingButton" Content="Done Separating" HorizontalAlignment="Left" Margin="475,664,0,0" VerticalAlignment="Top" Height="57" Width="206" FontSize="24" Click="DoneWithFingersButton_Click" Visibility="Collapsed"/>
             </Grid>
 
+            <TextBlock x:Name="isDependentText" HorizontalAlignment="Left" Margin="196,227,0,0" Text="Are the hands dependent between each other?" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="YesDependentButton" Content="Yes" HorizontalAlignment="Left" Margin="289,313,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OptionDependentButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="NoDependentButton" Content="No" HorizontalAlignment="Left" Margin="511,313,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OptionDependentButton_Click" Visibility="Collapsed"/>
+
             <Button x:Name="ShapeDoneButton" Content="Done Shaping" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="148" FontWeight="Bold" FontSize="16" Click="ShapeDoneButton_Click" Visibility="Collapsed"/>
             <Button x:Name="AnotherShapeButton" Content="Add Another Shape" HorizontalAlignment="Left" Margin="198,947,0,0" VerticalAlignment="Top" Height="56" Width="178" FontWeight="Bold" FontSize="16" Click="AnotherShapeButton_Click" Visibility="Collapsed"/>
         </Grid>
@@ -156,6 +162,43 @@
             <Button x:Name="DoneTrajectoryButton" Content="Done Trajectoring" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="155" FontWeight="Bold" FontSize="16" Click="DoneTrajectoringButton_Click" Visibility="Collapsed"/>
         </Grid>
 
-        <ComboBox x:Name="IndVarComboBox" Header="Individual Variables" Height="59" Width="341" HorizontalAlignment="Left" Margin="915,338,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+        <TextBlock x:Name="doesExemplifyText" HorizontalAlignment="Left" Margin="204,227,0,0" Text="Does this gesture exemplifies a variable?" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+        <Button x:Name="YesExemplifiesoButton" Content="Yes" HorizontalAlignment="Left" Margin="271,322,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OptionExemplifiesButton_OnClick" Visibility="Collapsed"/>
+        <Button x:Name="NoExemplifiesButton" Content="No" HorizontalAlignment="Left" Margin="493,322,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OptionExemplifiesButton_OnClick" Visibility="Collapsed"/>
+
+        <Grid x:Name="ExemplifiesGrid" Visibility="Collapsed">
+            <TextBlock x:Name="RightExemplefiesText" HorizontalAlignment="Left" Margin="164,227,0,0" Text="Assign an individual variable to the right hand" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="LeftExemplefiesText" HorizontalAlignment="Left" Margin="164,227,0,0" Text="Assign an individual variable to the left hand" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <ComboBox x:Name="IndVarComboBox" Header="Individual Variables" Height="59" Width="455" HorizontalAlignment="Left" Margin="219,315,0,0" VerticalAlignment="Top"/>
+            <TextBlock x:Name="CreateIndVarText" HorizontalAlignment="Left" Margin="204,428,0,0" Text="Or create a new one" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold"/>
+            <TextBox x:Name="IndividualTextbox" Height="16" Margin="219,508,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Name" HorizontalAlignment="Left" Width="254"/>
+            <Button x:Name="CreateIndVarButton" Content="Create" HorizontalAlignment="Left" Margin="516,499,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" Click="CreateIndVarButton_Click"/>
+            <Button x:Name="DoneAssigningButton" Content="Done" HorizontalAlignment="Left" Margin="471,593,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" Click="DoneAssigningVarButton_Click"/>
+        </Grid>
+
+        <Button x:Name="DoneExemplifyingButton" Content="Done Exemplifying" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="167" FontWeight="Bold" FontSize="16" Click="DoneExemplifyingButton_Click" Visibility="Collapsed"/>
+
+        <Grid x:Name="SynchroGrid">
+            <TextBlock x:Name="isSynchroText" HorizontalAlignment="Left" Margin="204,227,0,0" Text="Is the gesture synchronized with an event?" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="YesSynchroButton" Content="Yes" HorizontalAlignment="Left" Margin="271,322,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OptionSynchroButton_OnClick" Visibility="Collapsed"/>
+            <Button x:Name="NoSynchroButton" Content="No" HorizontalAlignment="Left" Margin="493,322,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OptionSynchroButton_OnClick" Visibility="Collapsed"/>
+            <TextBlock x:Name="ChoooseEventText" HorizontalAlignment="Left" Margin="164,203,0,0" Text="Assign an eventuality variable to the gesture" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26" FontWeight="Bold" Visibility="Collapsed"/>
+            <ComboBox x:Name="EventVarComboBox" Header="Eventuality Variables" Height="59" Width="455" HorizontalAlignment="Left" Margin="219,259,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+            <TextBlock x:Name="CreatedEventVar" HorizontalAlignment="Left" Margin="164,350,0,0" Text="" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="CreateIndVarText2" HorizontalAlignment="Left" Margin="206,412,0,0" Text="Or create a new one" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBox x:Name="EventualityTextbox" Height="16" Margin="220,482,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Name" HorizontalAlignment="Left" Width="254" Visibility="Collapsed"/>
+            <Button x:Name="CreateEventVarButton" Content="Create" HorizontalAlignment="Left" Margin="517,473,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" Click="CreateEventVarButton_Click" Visibility="Collapsed"/>
+            <TextBlock x:Name="selectSynchroEventText" HorizontalAlignment="Left" Margin="209,561,0,0" Text="Select the individual variables involved" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBox x:Name="IndividualTextbox2" Height="16" Margin="237,812,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Individual" HorizontalAlignment="Left" Width="215" Visibility="Collapsed"/>
+            <Button x:Name="CreateIndVarButton2" Content="Create" HorizontalAlignment="Left" Margin="518,803,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" RenderTransformOrigin="0.506,0.02" Click="CreateIndVarButton2_Click" Visibility="Collapsed"/>
+            <ComboBox x:Name="IndVarComboBox2" Header="Individual Variables" Height="59" Width="455" HorizontalAlignment="Left" Margin="219,635,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+            <TextBlock x:Name="AddIndVarText" HorizontalAlignment="Left" Margin="206,741,0,0" Text="Or add new individual variables" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="AddIndtoEventButton" Content="Add" HorizontalAlignment="Left" Margin="182,885,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" RenderTransformOrigin="0.506,0.02" Click="AddIndtoEventButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="DoneEventVarButton" Content="Create" HorizontalAlignment="Left" Margin="378,885,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" RenderTransformOrigin="0.506,0.02" Click="DoneEventVarButton_Click" Visibility="Collapsed"/>
+            <Button x:Name="FinishEventVarButton" Content="Finish" HorizontalAlignment="Left" Margin="578,885,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" RenderTransformOrigin="0.506,0.02" Click="FinishEventVarButton_Click" Visibility="Collapsed"/>
+        </Grid>
+
+        <Button x:Name="DoneSynchronizingButton" Content="Done Synchronizing" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="177" FontWeight="Bold" FontSize="16" Click="DoneSynchronizingButton_Click" Visibility="Collapsed"/>
+
     </Grid>
 </Page>

@@ -30,8 +30,6 @@ namespace TheAnnotator9000
     /// </summary>
     /// 
 
-    
-
     public sealed partial class MainPage : Page
     {
         private Type g_VariableType;
@@ -50,6 +48,8 @@ namespace TheAnnotator9000
         private bool g_LeftExists;
         private int g_NumPlaceholders;
         private int g_CurrentPlaceholder;
+
+        private bool g_FirstTimeIndVar;
 
         public MainPage()
         {
@@ -83,6 +83,10 @@ namespace TheAnnotator9000
 
             g_RightExists = false;
             g_LeftExists = false;
+
+            g_FirstTimeIndVar = true;
+
+            //IndVarComboBox.Items.Add("Ejemplo 2");
         }
 
         private void ButtonLogin_Click(object sender, RoutedEventArgs e)
@@ -136,6 +140,8 @@ namespace TheAnnotator9000
                     GestureIDText.Text += selectedGesture["Gesture Code"].ToString();
                     GestureIDText.Visibility = Visibility.Visible;
                     GestureRecording.Visibility = Visibility.Visible;
+                    RightText.Visibility = Visibility.Visible;
+                    LeftText.Visibility = Visibility.Visible;
                     SpeechTranscriptionText.Visibility = Visibility.Visible;
 
                     gestureVideoPlayback(selectedGesture);
@@ -205,8 +211,6 @@ namespace TheAnnotator9000
             {
                 if (obj.GetType() == typeof(ToggleButton))
                 {
-                    Debug.WriteLine(obj.GetType().ToString());
-                    Debug.WriteLine(typeof(ToggleButton).ToString());
                     ToggleButton thisButton = (ToggleButton)obj;
                     if (thisButton.IsChecked == true)
                     {
@@ -457,8 +461,9 @@ namespace TheAnnotator9000
                 LeftArmText.Visibility = Visibility.Collapsed;
                 YesButton.Visibility = Visibility.Collapsed;
                 NoButton.Visibility = Visibility.Collapsed;
-                AnotherShapeButton.Visibility = Visibility.Visible;
-                ShapeDoneButton.Visibility = Visibility.Visible;
+                isDependentText.Visibility = Visibility.Visible;
+                YesDependentButton.Visibility = Visibility.Visible;
+                NoDependentButton.Visibility = Visibility.Visible;
             }
 
             FingerSeparationText.Visibility = Visibility.Collapsed;
@@ -479,6 +484,28 @@ namespace TheAnnotator9000
             IndexFingerSwitch.Visibility = Visibility.Collapsed;
 
             DoneSeparatingButton.Visibility = Visibility.Collapsed;
+        }
+
+        private void OptionDependentButton_Click(object sender, RoutedEventArgs e)
+        {
+            Button selectedButton = sender as Button;
+            string predicateName = "blabla" + selectedButton.Content.ToString();
+
+            if (selectedButton.Content.ToString() == "Yes")
+            {
+                // predicate yes
+            }
+            else
+            {
+                // predicate no
+            }
+
+            isDependentText.Visibility = Visibility.Collapsed;
+            YesDependentButton.Visibility = Visibility.Collapsed;
+            NoDependentButton.Visibility = Visibility.Collapsed;
+
+            AnotherShapeButton.Visibility = Visibility.Visible;
+            ShapeDoneButton.Visibility = Visibility.Visible;
         }
 
         private void HandFingerButton_Click(object sender, RoutedEventArgs e)
@@ -599,7 +626,7 @@ namespace TheAnnotator9000
             
             g_CurrentPlaceholder++;
 
-            if (g_CurrentPlaceholder<=g_NumPlaceholders)
+            if (g_CurrentPlaceholder<g_NumPlaceholders)
             {
                 char[] chars = DescribeTrajectoryText.Text.ToCharArray();
                 chars[chars.Length-1] = Convert.ToChar(g_CurrentPlaceholder.ToString());
@@ -613,6 +640,7 @@ namespace TheAnnotator9000
 
                 if (currentArm == "Right" && g_LeftExists)
                 {
+                    NumPlaceholdersTextbox.Text = "";
                     LeftPlaceholdersText.Visibility = Visibility.Visible;
                     NumPlaceholdersTextbox.Visibility = Visibility.Visible;
                     DoneNumPlaceholdersButton.Visibility = Visibility.Visible;
@@ -622,16 +650,227 @@ namespace TheAnnotator9000
                 {
                     DoneTrajectoryButton.Visibility = Visibility.Visible;
                 }
-            }
-
-            
+            }           
         }
 
         private void DoneTrajectoringButton_Click(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("CACHIN");
-
             DoneTrajectoryButton.Visibility = Visibility.Collapsed;
+
+            if (g_RightExists || g_LeftExists)
+            {
+                doesExemplifyText.Visibility = Visibility.Visible;
+                YesExemplifiesoButton.Visibility = Visibility.Visible;
+                NoExemplifiesButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                DoneExemplifyingButton.Visibility = Visibility.Visible;
+            }
         }
+
+        private void OptionExemplifiesButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            doesExemplifyText.Visibility = Visibility.Collapsed;
+            YesExemplifiesoButton.Visibility = Visibility.Collapsed;
+            NoExemplifiesButton.Visibility = Visibility.Collapsed;
+
+            Button selectedButton = sender as Button;
+
+            if (selectedButton.Content.ToString() == "Yes")
+            {
+                if (g_RightExists)
+                {
+                    ExemplifiesGrid.Visibility = Visibility.Visible;
+                    RightExemplefiesText.Visibility = Visibility.Visible;
+                    currentArm = "Right";
+                }
+                else
+                {
+                    ExemplifiesGrid.Visibility = Visibility.Visible;
+                    LeftExemplefiesText.Visibility = Visibility.Visible;
+                    currentArm = "Left";
+                }
+            }
+            else
+            {
+                DoneExemplifyingButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CreateIndVarButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (IndividualTextbox.Text != "")
+            {
+                //create
+
+                IndVarComboBox.Items.Add(IndividualTextbox.Text);
+                IndVarComboBox2.Items.Add(IndividualTextbox.Text);
+                IndividualTextbox.Text = "";
+            }   
+        }
+
+        private void DoneAssigningVarButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (IndVarComboBox.SelectedItem != null)
+            {
+                // create
+
+                if (currentArm == "Right")
+                {
+                    RightExemplefiesText.Visibility = Visibility.Collapsed;
+
+                    if (g_LeftExists)
+                    {
+                        LeftExemplefiesText.Visibility = Visibility.Visible;
+                        currentArm = "Left";
+                    }
+                    else
+                    {
+                        ExemplifiesGrid.Visibility = Visibility.Collapsed;
+                        currentArm = "Right";
+
+                        DoneExemplifyingButton.Visibility = Visibility.Visible;
+                    }
+                }
+                else
+                {
+                    LeftExemplefiesText.Visibility = Visibility.Collapsed;
+                    ExemplifiesGrid.Visibility = Visibility.Collapsed;
+
+                    DoneExemplifyingButton.Visibility = Visibility.Visible;
+                }
+
+                IndVarComboBox.SelectedItem = null;
+            }
+        }
+
+        private void DoneExemplifyingButton_Click(object sender, RoutedEventArgs e)
+        {
+            DoneExemplifyingButton.Visibility = Visibility.Collapsed;
+
+            if (g_RightExists || g_LeftExists)
+            {
+                isSynchroText.Visibility = Visibility.Visible;
+                YesSynchroButton.Visibility = Visibility.Visible;
+                NoSynchroButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                DoneSynchronizingButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void OptionSynchroButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            Button selectedButton = sender as Button;
+            if (selectedButton.Content.ToString() == "Yes")
+            {
+                isSynchroText.Visibility = Visibility.Collapsed;
+                YesSynchroButton.Visibility = Visibility.Collapsed;
+                NoSynchroButton.Visibility = Visibility.Collapsed;
+
+                ChoooseEventText.Visibility = Visibility.Visible;
+                EventVarComboBox.Visibility = Visibility.Visible;
+                CreatedEventVar.Visibility = Visibility.Visible;
+                CreateIndVarText2.Visibility = Visibility.Visible;
+                EventualityTextbox.Visibility = Visibility.Visible;
+                CreateEventVarButton.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                DoneSynchronizingButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void CreateEventVarButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (EventualityTextbox.Text != "")
+            {
+                selectSynchroEventText.Visibility = Visibility.Visible;
+                EventualityTextbox.Visibility = Visibility.Visible;
+                CreateIndVarButton2.Visibility = Visibility.Visible;
+                IndVarComboBox2.Visibility = Visibility.Visible;
+                IndividualTextbox2.Visibility = Visibility.Visible;
+                AddIndVarText.Visibility = Visibility.Visible;
+                AddIndtoEventButton.Visibility = Visibility.Visible;
+                DoneEventVarButton.Visibility = Visibility.Visible;
+
+                CreatedEventVar.Text = EventualityTextbox.Text + "()";
+            }
+        }
+
+        private void CreateIndVarButton2_Click(object sender, RoutedEventArgs e)
+        {
+            if (IndividualTextbox2.Text != "")
+            {
+                IndVarComboBox.Items.Add(IndividualTextbox2.Text);
+                IndVarComboBox2.Items.Add(IndividualTextbox2.Text);
+                IndividualTextbox2.Text = "";   
+            }
+        }
+
+        private void AddIndtoEventButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (IndVarComboBox2.SelectedItem != null)
+            {
+                CreatedEventVar.Text = CreatedEventVar.Text.Remove(CreatedEventVar.Text.Length - 1);
+                if (!g_FirstTimeIndVar)
+                {
+                    CreatedEventVar.Text += ",";
+                }
+
+                g_FirstTimeIndVar = false;
+                CreatedEventVar.Text = CreatedEventVar.Text + IndVarComboBox2.SelectedValue + ")";
+                IndVarComboBox2.SelectedItem = null;
+            }
+        }
+
+        private void DoneEventVarButton_Click(object sender, RoutedEventArgs e)
+        {
+            if(EventualityTextbox.Text != "")
+            {
+                EventVarComboBox.Items.Add(EventualityTextbox.Text);
+                IndVarComboBox2.SelectedItem = null;
+                g_FirstTimeIndVar = true;
+                CreatedEventVar.Text = "";
+                EventualityTextbox.Text = "";
+
+                selectSynchroEventText.Visibility = Visibility.Collapsed;
+                IndividualTextbox2.Visibility = Visibility.Collapsed;
+                CreateIndVarButton2.Visibility = Visibility.Collapsed;
+                IndVarComboBox2.Visibility = Visibility.Collapsed;
+                AddIndVarText.Visibility = Visibility.Collapsed;
+                AddIndtoEventButton.Visibility = Visibility.Collapsed;
+                DoneEventVarButton.Visibility = Visibility.Collapsed;
+
+                FinishEventVarButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void FinishEventVarButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (EventVarComboBox.SelectedItem != null)
+            {
+                ChoooseEventText.Visibility = Visibility.Collapsed;
+                EventVarComboBox.Visibility = Visibility.Collapsed;
+                CreatedEventVar.Visibility = Visibility.Collapsed;
+                CreateIndVarText2.Visibility = Visibility.Collapsed;
+                EventualityTextbox.Visibility = Visibility.Collapsed;
+                CreateEventVarButton.Visibility = Visibility.Collapsed;
+                FinishEventVarButton.Visibility = Visibility.Collapsed;
+
+                DoneSynchronizingButton.Visibility = Visibility.Visible;
+            }
+        }
+
+        private void DoneSynchronizingButton_Click(object sender, RoutedEventArgs e)
+        {
+            Console.WriteLine("CACHIN");
+
+            DoneSynchronizingButton.Visibility = Visibility.Collapsed;
+        }
+
+        
     }
 }
