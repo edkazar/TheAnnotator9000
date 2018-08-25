@@ -173,7 +173,7 @@
             <TextBlock x:Name="CreateIndVarText" HorizontalAlignment="Left" Margin="204,428,0,0" Text="Or create a new one" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold"/>
             <TextBox x:Name="IndividualTextbox" Height="16" Margin="219,508,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Name" HorizontalAlignment="Left" Width="254"/>
             <Button x:Name="CreateIndVarButton" Content="Create" HorizontalAlignment="Left" Margin="516,499,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" Click="CreateIndVarButton_Click"/>
-            <Button x:Name="DoneAssigningButton" Content="Done" HorizontalAlignment="Left" Margin="471,593,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" Click="DoneAssigningVarButton_Click"/>
+            <Button x:Name="DoneAssigningButton" Content="Done" HorizontalAlignment="Left" Margin="363,593,0,0" VerticalAlignment="Top" Height="50" Width="158" FontSize="24" Click="DoneAssigningVarButton_Click"/>
         </Grid>
 
         <Button x:Name="DoneExemplifyingButton" Content="Done Exemplifying" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="167" FontWeight="Bold" FontSize="16" Click="DoneExemplifyingButton_Click" Visibility="Collapsed"/>
@@ -199,6 +199,25 @@
         </Grid>
 
         <Button x:Name="DoneSynchronizingButton" Content="Done Synchronizing" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="177" FontWeight="Bold" FontSize="16" Click="DoneSynchronizingButton_Click" Visibility="Collapsed"/>
+
+        <Grid x:Name="LocGrid">
+            <TextBlock x:Name="isRightLocText" HorizontalAlignment="Left" Margin="204,227,0,0" Text="Is the right hand gesture localizing a variable?" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26" FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="isLeftLocText" HorizontalAlignment="Left" Margin="204,227,0,0" Text="Is the left hand gesture localizing a variable?" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26" FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="YesLocButton" Content="Yes" HorizontalAlignment="Left" Margin="271,322,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OptionLocButton_OnClick" Visibility="Collapsed"/>
+            <Button x:Name="NoLocButton" Content="No" HorizontalAlignment="Left" Margin="493,322,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="OptionLocButton_OnClick" Visibility="Collapsed"/>
+            <TextBlock x:Name="LocforRightText" HorizontalAlignment="Left" Margin="164,205,0,0" Text="Assign an eventuality variable to the right hand gesture" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="LocforLeftText" HorizontalAlignment="Left" Margin="164,205,0,0" Text="Assign an eventuality variable to the left hand gesture" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <Button x:Name="AssignLocButton" Content="Assign" HorizontalAlignment="Left" Margin="358,740,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="AssignLocButton_OnClick" Visibility="Collapsed"/>
+            <TextBlock x:Name="SelectIndividualText" HorizontalAlignment="Left" Margin="172,581,0,0" Text="Assign an individual variable to the gesture" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <TextBlock x:Name="SelectPhysicalLocText" HorizontalAlignment="Left" Margin="179,355,0,0" Text="To which physical location does the gesture refer?" TextWrapping="Wrap" VerticalAlignment="Top" FontSize="26"  FontWeight="Bold" Visibility="Collapsed"/>
+            <ComboBox x:Name="PhysicalLocComboBox" Header="Physical Locations" Height="59" Width="455" HorizontalAlignment="Left" Margin="216,413,0,0" VerticalAlignment="Top" Visibility="Collapsed"/>
+            <TextBox x:Name="PhysicalLocTextbox" Height="16" Margin="212,513,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Location Name" HorizontalAlignment="Left" Width="254" Visibility="Collapsed"/>
+            <Button x:Name="CreateLocButton" Content="Create" HorizontalAlignment="Left" Margin="521,501,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="CreateLocButton_OnClick" Visibility="Collapsed"/>
+        </Grid>
+
+        <Button x:Name="DoneLocalizingButton" Content="Done Synchronizing" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="177" FontWeight="Bold" FontSize="16" Click="DoneLocalizingButton_Click" Visibility="Collapsed"/>
+        <Button x:Name="DoneAnnotatingButton" Content="Done Annotating" HorizontalAlignment="Left" Margin="363,871,0,0" VerticalAlignment="Top" Height="132" Width="259" FontWeight="Bold" FontSize="28" Click="DoneAnnotatingButton_Click" Visibility="Collapsed"/>
+        <Button x:Name="QuitButton" Content="Quit :(" HorizontalAlignment="Left" Margin="363,871,0,0" VerticalAlignment="Top" Height="132" Width="259" FontWeight="Bold" FontSize="28" Click="QuitButton_Click" Visibility="Collapsed"/>
 
     </Grid>
 </Page>

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.Core;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Media.Core;
@@ -40,9 +42,10 @@ namespace TheAnnotator9000
         private JArray g_GestureDatabase;
         private StorageFolder g_RootFolder;
         private MediaPlayer g_MediaPlayer;
-    
+        private string g_SelectedGestureID;
+
         private int g_GestureCounter;
-        private string currentArm;
+        private string g_CurrentArm;
 
         private bool g_RightExists;
         private bool g_LeftExists;
@@ -74,12 +77,13 @@ namespace TheAnnotator9000
             GestureIDTextInstruction5.Visibility = Visibility.Collapsed;
 
             g_RootFolder = ApplicationData.Current.LocalFolder;
+            Debug.WriteLine(g_RootFolder.Path);
             g_MediaPlayer = new MediaPlayer();
             g_MediaPlayer.IsLoopingEnabled = true;
 
             g_GestureCounter = 0;
 
-            currentArm = "";
+            g_CurrentArm = "";
 
             g_RightExists = false;
             g_LeftExists = false;
@@ -137,7 +141,8 @@ namespace TheAnnotator9000
                     GestureIDTextInstruction3.Visibility = Visibility.Collapsed;
                     GestureIDTextInstruction4.Visibility = Visibility.Collapsed;
                     GestureIDTextInstruction5.Visibility = Visibility.Collapsed;
-                    GestureIDText.Text += selectedGesture["Gesture Code"].ToString();
+                    g_SelectedGestureID = selectedGesture["Gesture Code"].ToString();
+                    GestureIDText.Text += g_SelectedGestureID;
                     GestureIDText.Visibility = Visibility.Visible;
                     GestureRecording.Visibility = Visibility.Visible;
                     RightText.Visibility = Visibility.Visible;
@@ -233,7 +238,7 @@ namespace TheAnnotator9000
             RightArmText.Visibility = Visibility.Visible;
             YesButton.Visibility = Visibility.Visible;
             NoButton.Visibility = Visibility.Visible;
-            currentArm = "Right";
+            g_CurrentArm = "Right";
         }
 
         
@@ -243,7 +248,7 @@ namespace TheAnnotator9000
             Button selectedButton = sender as Button;
             if(selectedButton.Content.ToString() == "Yes")
             {
-                if (currentArm == "Right")
+                if (g_CurrentArm == "Right")
                 {
                     g_RightExists = true;
                 }
@@ -266,11 +271,11 @@ namespace TheAnnotator9000
             }
             else
             {
-                if(currentArm == "Right")
+                if(g_CurrentArm == "Right")
                 {
                     RightArmText.Visibility = Visibility.Collapsed;
                     LeftArmText.Visibility = Visibility.Visible;
-                    currentArm = "Left";
+                    g_CurrentArm = "Left";
                 }
                 else
                 {
@@ -449,12 +454,12 @@ namespace TheAnnotator9000
         private void DoneWithFingersButton_Click(object sender, RoutedEventArgs e)
         {
             //Create
-            if (currentArm == "Right")
+            if (g_CurrentArm == "Right")
             {
                 LeftArmText.Visibility = Visibility.Visible;
                 YesButton.Visibility = Visibility.Visible;
                 NoButton.Visibility = Visibility.Visible;
-                currentArm = "Left";
+                g_CurrentArm = "Left";
             }
             else
             {
@@ -528,7 +533,7 @@ namespace TheAnnotator9000
             RightArmText.Visibility = Visibility.Visible;
             YesButton.Visibility = Visibility.Visible;
             NoButton.Visibility = Visibility.Visible;
-            currentArm = "Right";
+            g_CurrentArm = "Right";
 
             AnotherShapeButton.Visibility = Visibility.Collapsed;
             ShapeDoneButton.Visibility = Visibility.Collapsed;
@@ -544,14 +549,14 @@ namespace TheAnnotator9000
                 RightPlaceholdersText.Visibility = Visibility.Visible;
                 NumPlaceholdersTextbox.Visibility = Visibility.Visible;
                 DoneNumPlaceholdersButton.Visibility = Visibility.Visible;
-                currentArm = "Right";
+                g_CurrentArm = "Right";
             }
             else if (g_LeftExists)
             {
                 LeftPlaceholdersText.Visibility = Visibility.Visible;
                 NumPlaceholdersTextbox.Visibility = Visibility.Visible;
                 DoneNumPlaceholdersButton.Visibility = Visibility.Visible;
-                currentArm = "Left";
+                g_CurrentArm = "Left";
             }
             else
             {
@@ -638,13 +643,13 @@ namespace TheAnnotator9000
                 MotionDirectionsGrid.Visibility = Visibility.Collapsed;
                 MotionPlanesImage.Visibility = Visibility.Collapsed;
 
-                if (currentArm == "Right" && g_LeftExists)
+                if (g_CurrentArm == "Right" && g_LeftExists)
                 {
                     NumPlaceholdersTextbox.Text = "";
                     LeftPlaceholdersText.Visibility = Visibility.Visible;
                     NumPlaceholdersTextbox.Visibility = Visibility.Visible;
                     DoneNumPlaceholdersButton.Visibility = Visibility.Visible;
-                    currentArm = "Left";
+                    g_CurrentArm = "Left";
                 }
                 else
                 {
@@ -683,13 +688,13 @@ namespace TheAnnotator9000
                 {
                     ExemplifiesGrid.Visibility = Visibility.Visible;
                     RightExemplefiesText.Visibility = Visibility.Visible;
-                    currentArm = "Right";
+                    g_CurrentArm = "Right";
                 }
                 else
                 {
                     ExemplifiesGrid.Visibility = Visibility.Visible;
                     LeftExemplefiesText.Visibility = Visibility.Visible;
-                    currentArm = "Left";
+                    g_CurrentArm = "Left";
                 }
             }
             else
@@ -716,19 +721,19 @@ namespace TheAnnotator9000
             {
                 // create
 
-                if (currentArm == "Right")
+                if (g_CurrentArm == "Right")
                 {
                     RightExemplefiesText.Visibility = Visibility.Collapsed;
 
                     if (g_LeftExists)
                     {
                         LeftExemplefiesText.Visibility = Visibility.Visible;
-                        currentArm = "Left";
+                        g_CurrentArm = "Left";
                     }
                     else
                     {
                         ExemplifiesGrid.Visibility = Visibility.Collapsed;
-                        currentArm = "Right";
+                        g_CurrentArm = "Right";
 
                         DoneExemplifyingButton.Visibility = Visibility.Visible;
                     }
@@ -763,13 +768,14 @@ namespace TheAnnotator9000
 
         private void OptionSynchroButton_OnClick(object sender, RoutedEventArgs e)
         {
+            isSynchroText.Visibility = Visibility.Collapsed;
+            YesSynchroButton.Visibility = Visibility.Collapsed;
+            NoSynchroButton.Visibility = Visibility.Collapsed;
+
             Button selectedButton = sender as Button;
+
             if (selectedButton.Content.ToString() == "Yes")
             {
-                isSynchroText.Visibility = Visibility.Collapsed;
-                YesSynchroButton.Visibility = Visibility.Collapsed;
-                NoSynchroButton.Visibility = Visibility.Collapsed;
-
                 ChoooseEventText.Visibility = Visibility.Visible;
                 EventVarComboBox.Visibility = Visibility.Visible;
                 CreatedEventVar.Visibility = Visibility.Visible;
@@ -852,6 +858,10 @@ namespace TheAnnotator9000
         {
             if (EventVarComboBox.SelectedItem != null)
             {
+                //create
+
+                EventVarComboBox.SelectedItem = null;
+
                 ChoooseEventText.Visibility = Visibility.Collapsed;
                 EventVarComboBox.Visibility = Visibility.Collapsed;
                 CreatedEventVar.Visibility = Visibility.Collapsed;
@@ -866,11 +876,167 @@ namespace TheAnnotator9000
 
         private void DoneSynchronizingButton_Click(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine("CACHIN");
+            if (g_RightExists || g_LeftExists)
+            {
+                YesLocButton.Visibility = Visibility.Visible;
+                NoLocButton.Visibility = Visibility.Visible;
 
-            DoneSynchronizingButton.Visibility = Visibility.Collapsed;
+                DoneSynchronizingButton.Visibility = Visibility.Collapsed;
+
+                if (g_RightExists)
+                {
+                    isRightLocText.Visibility = Visibility.Visible;
+                    g_CurrentArm = "Right";
+                }
+                else
+                {
+                    isLeftLocText.Visibility = Visibility.Visible;
+                    g_CurrentArm = "Left";
+                }
+            }
+            else
+            {
+                DoneLocalizingButton.Visibility = Visibility.Visible;
+            }
         }
 
-        
+        private void OptionLocButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            Button selectedButton = sender as Button;
+            if (selectedButton.Content.ToString() == "Yes")
+            {
+                isRightLocText.Visibility = Visibility.Collapsed;
+                isLeftLocText.Visibility = Visibility.Collapsed;
+                YesLocButton.Visibility = Visibility.Collapsed;
+                NoLocButton.Visibility = Visibility.Collapsed;
+
+                EventVarComboBox.Visibility = Visibility.Visible;
+                IndVarComboBox2.Visibility = Visibility.Visible;
+                SelectPhysicalLocText.Visibility = Visibility.Visible;
+                PhysicalLocTextbox.Visibility = Visibility.Visible;
+                PhysicalLocComboBox.Visibility = Visibility.Visible;
+                SelectIndividualText.Visibility = Visibility.Visible;
+                CreateLocButton.Visibility = Visibility.Visible;
+                AssignLocButton.Visibility = Visibility.Visible;
+
+                if(g_CurrentArm == "Right")
+                {
+                    LocforRightText.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    LocforLeftText.Visibility = Visibility.Visible;
+                }
+            }
+            else
+            {
+                LocforRightText.Visibility = Visibility.Collapsed;
+                LocforLeftText.Visibility = Visibility.Collapsed;
+                isRightLocText.Visibility = Visibility.Collapsed;
+                isLeftLocText.Visibility = Visibility.Collapsed;
+                YesLocButton.Visibility = Visibility.Collapsed;
+                NoLocButton.Visibility = Visibility.Collapsed;
+
+                if (g_CurrentArm == "Right")
+                {
+                    LocforLeftText.Visibility = Visibility.Visible;
+                    YesLocButton.Visibility = Visibility.Visible;
+                    NoLocButton.Visibility = Visibility.Visible;
+
+                    g_CurrentArm = "Left";
+                }
+                else
+                {
+                    
+
+                    DoneLocalizingButton.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
+        private void CreateLocButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if(PhysicalLocTextbox.Text != "")
+            {
+                PhysicalLocComboBox.Items.Add(PhysicalLocTextbox.Text);
+
+                PhysicalLocTextbox.Text = "";
+            }
+        }
+
+        private void AssignLocButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            if (EventVarComboBox.SelectedItem != null && IndVarComboBox2.SelectedItem != null && PhysicalLocComboBox.SelectedItem != null)
+            {
+                EventVarComboBox.SelectedItem = null;
+                IndVarComboBox2.SelectedItem = null;
+                PhysicalLocComboBox.SelectedItem = null;
+
+                EventVarComboBox.Visibility = Visibility.Collapsed;
+                IndVarComboBox2.Visibility = Visibility.Collapsed;
+                SelectPhysicalLocText.Visibility = Visibility.Collapsed;
+                PhysicalLocTextbox.Visibility = Visibility.Collapsed;
+                SelectIndividualText.Visibility = Visibility.Collapsed;
+                PhysicalLocComboBox.Visibility = Visibility.Collapsed;
+                CreateLocButton.Visibility = Visibility.Collapsed;
+                AssignLocButton.Visibility = Visibility.Collapsed;
+                LocforRightText.Visibility = Visibility.Collapsed;
+                LocforLeftText.Visibility = Visibility.Collapsed;
+
+                if (g_CurrentArm == "Right")
+                {
+                    //create
+                    g_CurrentArm = "Left";
+                    YesLocButton.Visibility = Visibility.Visible;
+                    NoLocButton.Visibility = Visibility.Visible;
+                    isLeftLocText.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    //create
+                    DoneLocalizingButton.Visibility = Visibility.Visible;
+                }
+            }
+        }
+
+        private void DoneLocalizingButton_Click(object sender, RoutedEventArgs e)
+        {
+            DoneLocalizingButton.Visibility = Visibility.Collapsed;
+
+            DoneAnnotatingButton.Visibility = Visibility.Visible;
+        }
+
+        private void DoneAnnotatingButton_Click(object sender, RoutedEventArgs e)
+        {
+            DoneAnnotatingButton.Visibility = Visibility.Collapsed;
+
+            GestureIDTextbox.Visibility = Visibility.Visible;
+            GestureIDButton.Visibility = Visibility.Visible;
+            GestureIDTextInstruction1.Visibility = Visibility.Visible;
+            GestureIDTextInstruction2.Visibility = Visibility.Visible;
+            GestureIDTextInstruction3.Visibility = Visibility.Visible;
+            GestureIDTextInstruction4.Visibility = Visibility.Visible;
+            GestureIDTextInstruction5.Visibility = Visibility.Visible;
+            QuitButton.Visibility = Visibility.Visible;
+
+            saveGestureIDtoFile();
+        }
+
+        private void QuitButton_Click(object sender, RoutedEventArgs e)
+        {
+            CoreApplication.Exit();
+        }
+
+        private async void saveGestureIDtoFile()
+        {
+            //save gesture id to annotated id file
+            string filepath = @"JSONs\gesturesIDs.json";
+            StorageFile file = await g_RootFolder.GetFileAsync(filepath);
+            var data = await FileIO.ReadTextAsync(file);
+            JArray g_GesturesID = JArray.Parse(data);
+            g_GesturesID.Add(g_SelectedGestureID);
+            string string_to_send = JsonConvert.SerializeObject(g_GesturesID, Formatting.None);
+            await FileIO.WriteTextAsync(file, string_to_send);
+        }
     }
 }
