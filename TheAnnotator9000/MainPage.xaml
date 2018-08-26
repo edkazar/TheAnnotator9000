@@ -17,6 +17,7 @@
         <TextBox x:Name="GestureIDTextbox" Height="16" Margin="265,155,0,0" Text="" VerticalAlignment="Top" PlaceholderText="GestureID" HorizontalAlignment="Left" Width="215" Visibility="Collapsed"/>
         <Button x:Name="GestureIDButton" Content="Select" HorizontalAlignment="Left" Margin="121,155,0,0" VerticalAlignment="Top" Height="32" Width="105" Click="GestureIDButton_Click" Visibility="Collapsed"/>
         <TextBlock x:Name="ErrorMessageText" HorizontalAlignment="Left" Margin="173,206,0,0" Text="No Gesture Found with Specified ID" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
+        <TextBlock x:Name="RepeatedGestureMessageText" HorizontalAlignment="Left" Margin="173,206,0,0" Text="This gesture was already annotated" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
         <TextBlock x:Name="GestureIDTextInstruction1" HorizontalAlignment="Left" Margin="121,80,0,0" Text="Remember GestureID = WXYZ" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
         <TextBlock x:Name="GestureIDTextInstruction2" HorizontalAlignment="Left" Margin="358,56,0,0" Text="W = Experiment Number" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Collapsed"/>
         <TextBlock x:Name="GestureIDTextInstruction3" HorizontalAlignment="Left" Margin="358,76,0,0" Text="X = Agent Type (1 = W, 2 = H)" TextWrapping="Wrap" VerticalAlignment="Top" Visibility="Collapsed"/>
@@ -215,7 +216,7 @@
             <Button x:Name="CreateLocButton" Content="Create" HorizontalAlignment="Left" Margin="521,501,0,0" VerticalAlignment="Top" Height="57" Width="158" FontSize="24" Click="CreateLocButton_OnClick" Visibility="Collapsed"/>
         </Grid>
 
-        <Button x:Name="DoneLocalizingButton" Content="Done Synchronizing" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="177" FontWeight="Bold" FontSize="16" Click="DoneLocalizingButton_Click" Visibility="Collapsed"/>
+        <Button x:Name="DoneLocalizingButton" Content="Done Localizing" HorizontalAlignment="Left" Margin="445,947,0,0" VerticalAlignment="Top" Height="56" Width="177" FontWeight="Bold" FontSize="16" Click="DoneLocalizingButton_Click" Visibility="Collapsed"/>
         <Button x:Name="DoneAnnotatingButton" Content="Done Annotating" HorizontalAlignment="Left" Margin="363,871,0,0" VerticalAlignment="Top" Height="132" Width="259" FontWeight="Bold" FontSize="28" Click="DoneAnnotatingButton_Click" Visibility="Collapsed"/>
         <Button x:Name="QuitButton" Content="Quit :(" HorizontalAlignment="Left" Margin="363,871,0,0" VerticalAlignment="Top" Height="132" Width="259" FontWeight="Bold" FontSize="28" Click="QuitButton_Click" Visibility="Collapsed"/>
 

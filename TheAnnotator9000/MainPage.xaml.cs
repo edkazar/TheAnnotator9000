@@ -40,6 +40,7 @@ namespace TheAnnotator9000
         private Type g_SpatiotemporalType;
 
         private JArray g_GestureDatabase;
+        private JArray g_AnnotatedGesturesID;
         private StorageFolder g_RootFolder;
         private MediaPlayer g_MediaPlayer;
         private string g_SelectedGestureID;
@@ -90,6 +91,8 @@ namespace TheAnnotator9000
 
             g_FirstTimeIndVar = true;
 
+            JArray g_AnnotatedGesturesID = new JArray();
+
             //IndVarComboBox.Items.Add("Ejemplo 2");
         }
 
@@ -112,6 +115,7 @@ namespace TheAnnotator9000
                 GestureIDTextInstruction5.Visibility = Visibility.Visible;
 
                 loadGestureDatabase();
+                loadGesturesIDsFile();
             }
         }
 
@@ -134,23 +138,39 @@ namespace TheAnnotator9000
 
                 if(selectedGesture != null)
                 {
-                    GestureIDTextbox.Visibility = Visibility.Collapsed;
-                    GestureIDButton.Visibility = Visibility.Collapsed;
-                    GestureIDTextInstruction1.Visibility = Visibility.Collapsed;
-                    GestureIDTextInstruction2.Visibility = Visibility.Collapsed;
-                    GestureIDTextInstruction3.Visibility = Visibility.Collapsed;
-                    GestureIDTextInstruction4.Visibility = Visibility.Collapsed;
-                    GestureIDTextInstruction5.Visibility = Visibility.Collapsed;
-                    g_SelectedGestureID = selectedGesture["Gesture Code"].ToString();
-                    GestureIDText.Text += g_SelectedGestureID;
-                    GestureIDText.Visibility = Visibility.Visible;
-                    GestureRecording.Visibility = Visibility.Visible;
-                    RightText.Visibility = Visibility.Visible;
-                    LeftText.Visibility = Visibility.Visible;
-                    SpeechTranscriptionText.Visibility = Visibility.Visible;
+                    bool startAnnotating = true;
 
-                    gestureVideoPlayback(selectedGesture);
-                    startGestureAnnotation();
+                    foreach (string ID in g_AnnotatedGesturesID)
+                    {
+                        if (ID == GestureIDTextbox.Text)
+                        {
+                            RepeatedGestureMessageText.Visibility = Visibility.Visible;
+                            startAnnotating = false;
+                            break;
+                        }
+                    }
+
+                    if (startAnnotating)
+                    {
+                        RepeatedGestureMessageText.Visibility = Visibility.Collapsed;
+                        GestureIDTextbox.Visibility = Visibility.Collapsed;
+                        GestureIDButton.Visibility = Visibility.Collapsed;
+                        GestureIDTextInstruction1.Visibility = Visibility.Collapsed;
+                        GestureIDTextInstruction2.Visibility = Visibility.Collapsed;
+                        GestureIDTextInstruction3.Visibility = Visibility.Collapsed;
+                        GestureIDTextInstruction4.Visibility = Visibility.Collapsed;
+                        GestureIDTextInstruction5.Visibility = Visibility.Collapsed;
+                        g_SelectedGestureID = selectedGesture["Gesture Code"].ToString();
+                        GestureIDText.Text += g_SelectedGestureID;
+                        GestureIDText.Visibility = Visibility.Visible;
+                        GestureRecording.Visibility = Visibility.Visible;
+                        RightText.Visibility = Visibility.Visible;
+                        LeftText.Visibility = Visibility.Visible;
+                        SpeechTranscriptionText.Visibility = Visibility.Visible;
+
+                        gestureVideoPlayback(selectedGesture);
+                        startGestureAnnotation();
+                    }
 
                 }
                 else
@@ -196,11 +216,6 @@ namespace TheAnnotator9000
         }
 
         private void startGestureAnnotation()
-        {
-            TaxonomyAnnotator();   
-        }
-
-        private void TaxonomyAnnotator()
         {
             TaxonomyAnnotatorGrid.Visibility = Visibility.Visible;
         }
@@ -896,6 +911,8 @@ namespace TheAnnotator9000
             }
             else
             {
+                DoneSynchronizingButton.Visibility = Visibility.Collapsed;
+
                 DoneLocalizingButton.Visibility = Visibility.Visible;
             }
         }
@@ -1027,15 +1044,26 @@ namespace TheAnnotator9000
             CoreApplication.Exit();
         }
 
+        private async void loadGesturesIDsFile()
+        {
+            string filepath = @"JSONs\gesturesIDs.json";
+            StorageFile file = await g_RootFolder.CreateFileAsync(filepath, CreationCollisionOption.OpenIfExists);
+            var data = await FileIO.ReadTextAsync(file);
+
+            g_AnnotatedGesturesID = new JArray();
+            if (data.Length > 0)
+            {
+                g_AnnotatedGesturesID = JArray.Parse(data);
+            }
+        }
+
         private async void saveGestureIDtoFile()
         {
             //save gesture id to annotated id file
             string filepath = @"JSONs\gesturesIDs.json";
-            StorageFile file = await g_RootFolder.GetFileAsync(filepath);
-            var data = await FileIO.ReadTextAsync(file);
-            JArray g_GesturesID = JArray.Parse(data);
-            g_GesturesID.Add(g_SelectedGestureID);
-            string string_to_send = JsonConvert.SerializeObject(g_GesturesID, Formatting.None);
+            StorageFile file = await g_RootFolder.CreateFileAsync(filepath, CreationCollisionOption.OpenIfExists);
+            g_AnnotatedGesturesID.Add(g_SelectedGestureID);
+            string string_to_send = JsonConvert.SerializeObject(g_AnnotatedGesturesID, Formatting.None);
             await FileIO.WriteTextAsync(file, string_to_send);
         }
     }
