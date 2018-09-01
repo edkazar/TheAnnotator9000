@@ -34,6 +34,11 @@ namespace TheAnnotator9000
 
     public sealed partial class MainPage : Page
     {
+        private ESDRSGenerator g_ESDRSGenerator;
+        private GestureAnnotation g_CurrentGesture;
+        private GestureShape g_CurrentShape;
+        private GestureMovement g_CurrentMovement;
+
         private Type g_VariableType;
         private Type g_PredicateType;
         private Type g_MappingType;
@@ -58,6 +63,8 @@ namespace TheAnnotator9000
         public MainPage()
         {
             this.InitializeComponent();
+
+            g_ESDRSGenerator = new ESDRSGenerator();
 
             g_VariableType = typeof(Variable);
             g_PredicateType = typeof(Predicate);
@@ -225,6 +232,42 @@ namespace TheAnnotator9000
             ToggleButton thisButton = (ToggleButton)sender;
         }
 
+        private Predicate Create1ArityPredicateAux(string pName, string pArgument1)
+        {
+            List<string> arguments = new List<string>();
+            arguments.Add(pArgument1);
+            List<Type> sort = new List<Type>();
+            sort.Add(typeof(Variable));
+            return g_ESDRSGenerator.createPredicate(pName, sort, arguments);
+        }
+
+        private Predicate Create2ArityPredicateAux(string pName, string pArgument1, string pArgument2)
+        {
+            List<string> arguments = new List<string>();
+            arguments.Add(pArgument1);
+            arguments.Add(pArgument2);
+            List<Type> sort = new List<Type>();
+            sort.Add(typeof(Variable));
+            sort.Add(typeof(Variable));
+            return g_ESDRSGenerator.createPredicate(pName, sort, arguments);
+        }
+
+        private Predicate Create3ArityPredicateAux(string pName, string pArgument1, string pArgument2, string pArgument3, bool pIsMapping)
+        {
+            List<string> arguments = new List<string>();
+            arguments.Add(pArgument1);
+            arguments.Add(pArgument2);
+            arguments.Add(pArgument3);
+            List<Type> sort = new List<Type>();
+            sort.Add(typeof(Variable));
+            sort.Add(typeof(Variable));
+            if(pIsMapping)
+                sort.Add(typeof(Mapping));
+            else
+                sort.Add(typeof(Variable));
+            return g_ESDRSGenerator.createPredicate(pName, sort, arguments);
+        }
+
         private void TaxButton_Click(object sender, RoutedEventArgs e)
         {
             foreach(Object obj in TaxonomyAnnotatorGrid.Children)
@@ -236,43 +279,52 @@ namespace TheAnnotator9000
                     {
                         if(thisButton.Content.ToString() != "Gesture")
                         {
-                            /*List<Variable> gestVar = new List<Variable>();
-                            gestVar.Add(g_IndividualVariables[g_IndividualVariables.Count - 1]);
-                            g_Predicates.Add(createPredicate(thisButton.Content.ToString(), gestVar));*/
+                            Predicate newPred = Create1ArityPredicateAux(thisButton.Content.ToString(), ConstantValues.g_GestureString + g_SelectedGestureID);
+                            g_CurrentGesture.ExtraPredicates.Add(newPred);
                         }
                         else
                         {
-                            /*createIndividualVariable("Var" + g_GestureCounter.ToString());
-                            g_GestureCounter++;*/
+                            // THE GESTURE ANNOTATION IS CREATED HERE!
+                            g_CurrentGesture = g_ESDRSGenerator.createGestureAnnotation(g_SelectedGestureID);
+                            Variable newVar = g_ESDRSGenerator.createVariable(ConstantValues.g_GestureString, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
+                            g_CurrentGesture.Variables.Add(newVar);
+                            Predicate newPred = Create1ArityPredicateAux(newVar.name, newVar.name);
+                            g_CurrentGesture.ExtraPredicates.Add(newPred);
                         }
                     }
                 }
             }
+            
+            g_CurrentShape = g_ESDRSGenerator.createGestureShape();
 
             TaxonomyAnnotatorGrid.Visibility = Visibility.Collapsed;
             RightArmText.Visibility = Visibility.Visible;
             YesButton.Visibility = Visibility.Visible;
             NoButton.Visibility = Visibility.Visible;
-            g_CurrentArm = "Right";
+            g_CurrentArm = ConstantValues.g_RightString;
         }
-
-        
 
         private void ShapeCreationButton_Click(object sender, RoutedEventArgs e)
         {
             Button selectedButton = sender as Button;
             if(selectedButton.Content.ToString() == "Yes")
             {
-                if (g_CurrentArm == "Right")
+                Variable newVar = new Variable();
+
+                if (g_CurrentArm == ConstantValues.g_RightString)
                 {
                     g_RightExists = true;
+                    newVar = g_ESDRSGenerator.createVariable(ConstantValues.g_RightString + ConstantValues.g_GestureString, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
                 }
                 else
                 {
                     g_LeftExists = true;
+                    newVar = g_ESDRSGenerator.createVariable(ConstantValues.g_LeftString + ConstantValues.g_GestureString, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());      
                 }
-                    
-                //crear variables
+
+                g_CurrentGesture.Variables.Add(newVar);
+                Predicate newPred = Create1ArityPredicateAux(newVar.name, newVar.name);
+                g_CurrentGesture.ExtraPredicates.Add(newPred);
 
                 ArmPoseText.Visibility = Visibility.Visible;
                 ExtendedPoseButton.Visibility = Visibility.Visible;
@@ -286,11 +338,11 @@ namespace TheAnnotator9000
             }
             else
             {
-                if(g_CurrentArm == "Right")
+                if(g_CurrentArm == ConstantValues.g_RightString)
                 {
                     RightArmText.Visibility = Visibility.Collapsed;
                     LeftArmText.Visibility = Visibility.Visible;
-                    g_CurrentArm = "Left";
+                    g_CurrentArm = ConstantValues.g_LeftString;
                 }
                 else
                 {
@@ -306,24 +358,35 @@ namespace TheAnnotator9000
         private void PoseButton_Click(object sender, RoutedEventArgs e)
         {
             Button selectedButton = sender as Button;
-            string predicateName = "blabla" + selectedButton.Content.ToString();
+            Variable newVar = new Variable();
 
             if (ArmPoseText.Visibility == Visibility.Visible)
             {
-                //crear variables del brazo
+                newVar = g_ESDRSGenerator.createVariable(g_CurrentArm + ConstantValues.g_ArmString, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
+                g_CurrentShape.Variables.Add(newVar);
+
                 ArmPoseText.Visibility = Visibility.Collapsed;
                 ArmOrientationText.Visibility = Visibility.Visible;
             }
             else if (HandPoseText.Visibility == Visibility.Visible)
             {
-                //crear variables de la mano
+                newVar = g_ESDRSGenerator.createVariable(g_CurrentArm + ConstantValues.g_HandString, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
+                g_CurrentShape.Variables.Add(newVar);
+
+                Predicate component = Create2ArityPredicateAux(ConstantValues.g_ComponentString, newVar.name, g_CurrentArm + ConstantValues.g_ArmString);
+                g_CurrentShape.Component.Add(component);
+
                 HandPoseText.Visibility = Visibility.Collapsed;
                 HandOrientationText.Visibility = Visibility.Visible;
-            }   
-            
+            }
+
+            Predicate newPred = Create1ArityPredicateAux(newVar.name, newVar.name);  
+            g_CurrentShape.Pose.Add(newPred);
+
             ExtendedPoseButton.Visibility = Visibility.Collapsed;
             SemiExtendedPoseButton.Visibility = Visibility.Collapsed;
             NoExtendedPoseButton.Visibility = Visibility.Collapsed;
+
             UpOrientationButton.Visibility = Visibility.Visible;
             DownOrientationButton.Visibility = Visibility.Visible;
             LeftOrientationButton.Visibility = Visibility.Visible;
@@ -334,11 +397,19 @@ namespace TheAnnotator9000
         private void OrientationButton_Click(object sender, RoutedEventArgs e)
         {
             Button selectedButton = sender as Button;
-            string predicateName = "blabla" + selectedButton.Content.ToString();
+            Predicate newPred = new Predicate();
 
             if (ArmOrientationText.Visibility == Visibility.Visible)
             {
-                //crear variables del brazo
+                if (g_CurrentArm == ConstantValues.g_RightString)
+                {
+                    newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), ConstantValues.g_RightString + ConstantValues.g_ArmString);
+                }
+                else
+                {
+                    newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), ConstantValues.g_LeftString + ConstantValues.g_ArmString);
+                }
+
                 ArmOrientationText.Visibility = Visibility.Collapsed;
                 HandPoseText.Visibility = Visibility.Visible;
                 ExtendedPoseButton.Visibility = Visibility.Visible;
@@ -347,7 +418,15 @@ namespace TheAnnotator9000
             }
             else if (HandOrientationText.Visibility == Visibility.Visible)
             {
-                //crear variables de la mano
+                if (g_CurrentArm == ConstantValues.g_RightString)
+                {
+                    newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), ConstantValues.g_RightString + ConstantValues.g_HandString);
+                }
+                else
+                {
+                    newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), ConstantValues.g_LeftString + ConstantValues.g_HandString);
+                }
+
                 HandOrientationText.Visibility = Visibility.Collapsed;
                 LittleFingerText.Visibility = Visibility.Visible;
                 FingerDescriptionText.Visibility = Visibility.Visible;
@@ -355,6 +434,8 @@ namespace TheAnnotator9000
                 FingerSemiExtendedPoseButton.Visibility = Visibility.Visible;
                 FingerNoExtendedPoseButton.Visibility = Visibility.Visible;
             }
+
+            g_CurrentShape.Orientation.Add(newPred);
 
             UpOrientationButton.Visibility = Visibility.Collapsed;
             DownOrientationButton.Visibility = Visibility.Collapsed;
@@ -366,35 +447,41 @@ namespace TheAnnotator9000
         private void FingerPoseButton_Click(object sender, RoutedEventArgs e)
         {
             Button selectedButton = sender as Button;
-            string predicateName = "blabla" + selectedButton.Content.ToString();
+            Variable newVar = new Variable();
+            string varName = g_CurrentArm;
 
             if (LittleFingerText.Visibility == Visibility.Visible)
             {
-                //create
+                varName = varName + LittleFingerText.Text + ConstantValues.g_FingerString;
+
                 LittleFingerText.Visibility = Visibility.Collapsed;
                 RingFingerText.Visibility = Visibility.Visible;
             }
             else if (RingFingerText.Visibility == Visibility.Visible)
             {
-                //create
+                varName = varName + RingFingerText.Text + ConstantValues.g_FingerString;
+
                 RingFingerText.Visibility = Visibility.Collapsed;
                 MiddleFingerText.Visibility = Visibility.Visible;
             }
             else if (MiddleFingerText.Visibility == Visibility.Visible)
             {
-                //create
+                varName = varName + MiddleFingerText.Text + ConstantValues.g_FingerString;
+
                 MiddleFingerText.Visibility = Visibility.Collapsed;
                 IndexFingerText.Visibility = Visibility.Visible;
             }
             else if (IndexFingerText.Visibility == Visibility.Visible)
             {
-                //create
+                varName = varName + IndexFingerText.Text + ConstantValues.g_FingerString;
+
                 IndexFingerText.Visibility = Visibility.Collapsed;
                 ThumbFingerText.Visibility = Visibility.Visible;
             }
             else
             {
-                //create
+                varName = varName + ThumbFingerText.Text + ConstantValues.g_FingerString;
+
                 ThumbFingerText.Visibility = Visibility.Collapsed;
                 LittleFingerText.Visibility = Visibility.Visible;
 
@@ -412,37 +499,53 @@ namespace TheAnnotator9000
                 FingerForwardOrientationButton.Visibility = Visibility.Visible;
             }
 
+            newVar = g_ESDRSGenerator.createVariable(varName, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
+            g_CurrentShape.Variables.Add(newVar);
+
+            Predicate component = Create2ArityPredicateAux(ConstantValues.g_ComponentString, newVar.name, g_CurrentArm + ConstantValues.g_HandString);
+            g_CurrentShape.Component.Add(component);
+
+            Predicate newPred = Create1ArityPredicateAux(newVar.name + ConstantValues.g_PoseString + selectedButton.Content.ToString(), newVar.name);
+            g_CurrentShape.Pose.Add(newPred);
         }
 
         private void FingerOrientationButton_Click(object sender, RoutedEventArgs e)
         {
+            Button selectedButton = sender as Button;
+            string predName = g_CurrentArm;
+
             if (LittleFingerText.Visibility == Visibility.Visible)
             {
-                //create
+                predName = predName + LittleFingerText.Text + ConstantValues.g_FingerString;
+
                 LittleFingerText.Visibility = Visibility.Collapsed;
                 RingFingerText.Visibility = Visibility.Visible;
             }
             else if (RingFingerText.Visibility == Visibility.Visible)
             {
-                //create
+                predName = predName + RingFingerText.Text + ConstantValues.g_FingerString;
+
                 RingFingerText.Visibility = Visibility.Collapsed;
                 MiddleFingerText.Visibility = Visibility.Visible;
             }
             else if (MiddleFingerText.Visibility == Visibility.Visible)
             {
-                //create
+                predName = predName + MiddleFingerText.Text + ConstantValues.g_FingerString;
+
                 MiddleFingerText.Visibility = Visibility.Collapsed;
                 IndexFingerText.Visibility = Visibility.Visible;
             }
             else if (IndexFingerText.Visibility == Visibility.Visible)
             {
-                //create
+                predName = predName + IndexFingerText.Text + ConstantValues.g_FingerString;
+
                 IndexFingerText.Visibility = Visibility.Collapsed;
                 ThumbFingerText.Visibility = Visibility.Visible;
             }
             else
             {
-                //create
+                predName = predName + ThumbFingerText.Text + ConstantValues.g_FingerString;
+
                 LittleFingerText.Visibility = Visibility.Visible;
                 RingFingerText.Visibility = Visibility.Visible;
                 MiddleFingerText.Visibility = Visibility.Visible;
@@ -464,17 +567,21 @@ namespace TheAnnotator9000
 
                 DoneSeparatingButton.Visibility = Visibility.Visible;
             }
+
+            Predicate newPred = Create1ArityPredicateAux(predName + ConstantValues.g_OrientationString + selectedButton.Content.ToString(), predName);
+            g_CurrentShape.Orientation.Add(newPred);
         }
 
         private void DoneWithFingersButton_Click(object sender, RoutedEventArgs e)
         {
-            //Create
-            if (g_CurrentArm == "Right")
+            createPredforSwitches();
+
+            if (g_CurrentArm == ConstantValues.g_RightString)
             {
                 LeftArmText.Visibility = Visibility.Visible;
                 YesButton.Visibility = Visibility.Visible;
                 NoButton.Visibility = Visibility.Visible;
-                g_CurrentArm = "Left";
+                g_CurrentArm = ConstantValues.g_LeftString;
             }
             else
             {
@@ -506,19 +613,54 @@ namespace TheAnnotator9000
             DoneSeparatingButton.Visibility = Visibility.Collapsed;
         }
 
+        private void createPredforSwitches()
+        {
+            if (LittleFingerSwitch.IsOn)
+            {
+                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_FingerString + ConstantValues.g_SeparatedString,
+                    g_CurrentArm + LittleFingerText.Text + ConstantValues.g_FingerString,
+                    g_CurrentArm + RingFingerText.Text + ConstantValues.g_FingerString);
+                g_CurrentShape.Separation.Add(newPred);
+            }
+
+            if (RingFingerSwitch.IsOn)
+            {
+                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_FingerString + ConstantValues.g_SeparatedString,
+                    g_CurrentArm + RingFingerText.Text + ConstantValues.g_FingerString,
+                    g_CurrentArm + MiddleFingerText.Text + ConstantValues.g_FingerString);
+                g_CurrentShape.Separation.Add(newPred);
+            }
+
+            if (MiddleFingerSwitch.IsOn)
+            {
+                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_FingerString + ConstantValues.g_SeparatedString,
+                    g_CurrentArm + MiddleFingerText.Text + ConstantValues.g_FingerString,
+                    g_CurrentArm + IndexFingerText.Text + ConstantValues.g_FingerString);
+                g_CurrentShape.Separation.Add(newPred);
+            }
+
+            if (IndexFingerSwitch.IsOn)
+            {
+                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_FingerString + ConstantValues.g_SeparatedString,
+                    g_CurrentArm + IndexFingerText.Text + ConstantValues.g_FingerString,
+                    g_CurrentArm + ThumbFingerText.Text + ConstantValues.g_FingerString);
+                g_CurrentShape.Separation.Add(newPred);
+            }
+        }
+
         private void OptionDependentButton_Click(object sender, RoutedEventArgs e)
         {
             Button selectedButton = sender as Button;
-            string predicateName = "blabla" + selectedButton.Content.ToString();
 
             if (selectedButton.Content.ToString() == "Yes")
             {
-                // predicate yes
+                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_DependenceString,
+                    ConstantValues.g_RightString + ConstantValues.g_GestureString, ConstantValues.g_LeftString + ConstantValues.g_GestureString);
+                g_CurrentShape.Dependence = newPred;
             }
-            else
-            {
-                // predicate no
-            }
+
+            g_CurrentGesture.Shape.Add(g_CurrentShape);
+            g_CurrentShape = g_ESDRSGenerator.createGestureShape();
 
             isDependentText.Visibility = Visibility.Collapsed;
             YesDependentButton.Visibility = Visibility.Collapsed;
@@ -528,27 +670,12 @@ namespace TheAnnotator9000
             ShapeDoneButton.Visibility = Visibility.Visible;
         }
 
-        private void HandFingerButton_Click(object sender, RoutedEventArgs e)
-        {
-            Button selectedButton = sender as Button;
-            string predicateName = "blabla" + selectedButton.Content.ToString();
-
-            if(selectedButton.Content.ToString() == "Yes")
-            {
-                // predicate yes
-            }
-            else
-            {
-                // predicate no
-            }
-        }
-
         private void AnotherShapeButton_Click(object sender, RoutedEventArgs e)
         {
             RightArmText.Visibility = Visibility.Visible;
             YesButton.Visibility = Visibility.Visible;
             NoButton.Visibility = Visibility.Visible;
-            g_CurrentArm = "Right";
+            g_CurrentArm = ConstantValues.g_RightString;
 
             AnotherShapeButton.Visibility = Visibility.Collapsed;
             ShapeDoneButton.Visibility = Visibility.Collapsed;
@@ -559,25 +686,26 @@ namespace TheAnnotator9000
             AnotherShapeButton.Visibility = Visibility.Collapsed;
             ShapeDoneButton.Visibility = Visibility.Collapsed;
 
+            g_CurrentMovement = g_ESDRSGenerator.createGestureMovement();
+            
             if (g_RightExists)
             {
                 RightPlaceholdersText.Visibility = Visibility.Visible;
                 NumPlaceholdersTextbox.Visibility = Visibility.Visible;
                 DoneNumPlaceholdersButton.Visibility = Visibility.Visible;
-                g_CurrentArm = "Right";
+                g_CurrentArm = ConstantValues.g_RightString;
             }
             else if (g_LeftExists)
             {
                 LeftPlaceholdersText.Visibility = Visibility.Visible;
                 NumPlaceholdersTextbox.Visibility = Visibility.Visible;
                 DoneNumPlaceholdersButton.Visibility = Visibility.Visible;
-                g_CurrentArm = "Left";
+                g_CurrentArm = ConstantValues.g_LeftString;
             }
             else
             {
                 DoneTrajectoryButton.Visibility = Visibility.Visible;
             }
-
         }
 
         private void DoneNumPlaceholdersButton_Click(object sender, RoutedEventArgs e)
@@ -588,10 +716,26 @@ namespace TheAnnotator9000
 
                 g_NumPlaceholders = Int32.Parse(NumPlaceholdersTextbox.Text);
                 g_CurrentPlaceholder = 1;
+                bool firstPoint = true;
 
-                for (int counter = 0; counter < g_NumPlaceholders; counter++)
+                for (int counter = 0; counter < g_NumPlaceholders - 1; counter++)
                 {
-                    //create
+                    //Assuming we are getting the Spationtemporal info. I neeed to do this.
+
+                    if (firstPoint)
+                    {
+                        Spatiotemporal firstPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 1).ToString(), 0, 0, 0, new TimeSpan());
+                        g_CurrentMovement.Points.Add(firstPlaceholderPoint);
+                        firstPoint = false;
+                    }
+                    
+                    Spatiotemporal newPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 2).ToString(), 0, 0, 0, new TimeSpan());
+                    g_CurrentMovement.Points.Add(newPlaceholderPoint);
+
+                    Variable newTraj = g_ESDRSGenerator.createVariable(g_CurrentArm + ConstantValues.g_TrajectoryString + (counter + 1).ToString(), ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
+                    g_CurrentMovement.Variables.Add(newTraj);
+                    Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_TrajectoryString, g_CurrentArm + g_CurrentMovement.Points[counter].name, g_CurrentArm + g_CurrentMovement.Points[counter + 1].name);
+                    g_CurrentMovement.Trajectories.Add(newPred);
                 }
 
                 LeftPlaceholdersText.Visibility = Visibility.Collapsed;
@@ -614,7 +758,9 @@ namespace TheAnnotator9000
         private void MotionOptionButton_Click(object sender, RoutedEventArgs e)
         {
             Button selectedButton = sender as Button;
-            string predicateName = "blabla" + selectedButton.Content.ToString();
+
+            Predicate newPred = Create1ArityPredicateAux(g_CurrentArm + ConstantValues.g_MainPlaneString + selectedButton.Content.ToString(), g_CurrentArm + ConstantValues.g_GestureString);
+            g_CurrentMovement.MainPlane = newPred;
 
             DescribePlaneOfMotion.Visibility = Visibility.Collapsed;
             MotionCoronalButton.Visibility = Visibility.Collapsed;
@@ -638,6 +784,8 @@ namespace TheAnnotator9000
                     if (thisButton.IsChecked == true)
                     {
                         // create
+                        Predicate newPred = Create1ArityPredicateAux(ConstantValues.g_DirectionString + thisButton.Content, g_CurrentMovement.Trajectories[g_CurrentPlaceholder - 1].name);
+                        g_CurrentMovement.Directions.Add(newPred);                        
                     }
 
                     thisButton.IsChecked = false;
@@ -658,13 +806,13 @@ namespace TheAnnotator9000
                 MotionDirectionsGrid.Visibility = Visibility.Collapsed;
                 MotionPlanesImage.Visibility = Visibility.Collapsed;
 
-                if (g_CurrentArm == "Right" && g_LeftExists)
+                if (g_CurrentArm == ConstantValues.g_RightString && g_LeftExists)
                 {
                     NumPlaceholdersTextbox.Text = "";
                     LeftPlaceholdersText.Visibility = Visibility.Visible;
                     NumPlaceholdersTextbox.Visibility = Visibility.Visible;
                     DoneNumPlaceholdersButton.Visibility = Visibility.Visible;
-                    g_CurrentArm = "Left";
+                    g_CurrentArm = ConstantValues.g_LeftString;
                 }
                 else
                 {
@@ -675,6 +823,9 @@ namespace TheAnnotator9000
 
         private void DoneTrajectoringButton_Click(object sender, RoutedEventArgs e)
         {
+            g_CurrentGesture.Movement = g_CurrentMovement;
+            g_CurrentMovement = g_ESDRSGenerator.createGestureMovement();
+
             DoneTrajectoryButton.Visibility = Visibility.Collapsed;
 
             if (g_RightExists || g_LeftExists)
@@ -688,7 +839,7 @@ namespace TheAnnotator9000
                 DoneExemplifyingButton.Visibility = Visibility.Visible;
             }
         }
-
+/// voy por el exemplifies
         private void OptionExemplifiesButton_OnClick(object sender, RoutedEventArgs e)
         {
             doesExemplifyText.Visibility = Visibility.Collapsed;
