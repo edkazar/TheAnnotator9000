@@ -25,6 +25,11 @@ namespace TheAnnotator9000
         public const string g_ComponentString = "Component";
         public const string g_DependenceString = "Dependence";
         public const string g_MainPlaneString = "MainPlane";
+        public const string g_ExemplifiesString = "Exemplifies";
+        public const string g_SynchroString = "Synchro";
+        public const string g_SpatiotempString = "Spatiotemp";
+        public const string g_MappingString = "Mapping";
+        public const string g_LocString = "Loc";
 
         ConstantValues()
         {

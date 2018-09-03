@@ -49,8 +49,6 @@ namespace TheAnnotator9000
         public List<Predicate> Orientation; // Position towards where the body part is facing
         public List<Predicate> Separation; // Whether the body part is separated (usually for fingers)
         public Predicate Dependence; // Whether or not there is a dependence between hands
-        public List<Predicate> ExtraPredicates; // For extra predicates
-
     };
 
     public struct GestureMovement
@@ -66,13 +64,17 @@ namespace TheAnnotator9000
     {
         public string name; // For ease purposes, not part of structure
         public List<Variable> Variables; // Variables created or used by the gesture
+        public List<Variable> ContextVars; // For variables of previous utterances
+        public List<Predicate> ContextPreds; // For variables of previous utterances
         public List<Predicate> TaxClass; // Taxonomy class of the gesture
         public List<GestureShape> Shape; // Struct describing the gesture's shape 
         public GestureMovement Movement; // Struct describing the gesture's movement
-        public Predicate Synchro; // Whether or not the gesture is synchronized with an event
-        public Predicate Loc; // Spatiotemporal information of the gesture
         public List<Predicate> Exemplifies; // Semantic concepts described by the gesture
+        public Predicate Synchro; // Whether or not the gesture is synchronized with an event
+        public List<Predicate> Loc; // Spatiotemporal information of the gesture
         public List<Predicate> ExtraPredicates; // For extra predicates
+        public List<Spatiotemporal> Spatiotemporals;
+        public List<Mapping> Mappings;
     };
 
     class ESDRSGenerator
@@ -99,9 +101,15 @@ namespace TheAnnotator9000
         {
             GestureAnnotation newGesture = new GestureAnnotation();
             newGesture.Variables = new List<Variable>();
+            newGesture.TaxClass = new List<Predicate>();
+            newGesture.ContextVars = new List<Variable>();
+            newGesture.ContextPreds = new List<Predicate>();
             newGesture.Shape = new List<GestureShape>();
             newGesture.Exemplifies = new List<Predicate>();
+            newGesture.Loc = new List<Predicate>();
             newGesture.ExtraPredicates = new List<Predicate>();
+            newGesture.Spatiotemporals = new List<Spatiotemporal>();
+            newGesture.Mappings = new List<Mapping>();
             newGesture.name = pGestureID;
             return newGesture;
         }
@@ -114,7 +122,6 @@ namespace TheAnnotator9000
             newShape.Pose = new List<Predicate>();
             newShape.Orientation = new List<Predicate>();
             newShape.Separation = new List<Predicate>();
-            newShape.ExtraPredicates = new List<Predicate>();
             return newShape;
         }
 
