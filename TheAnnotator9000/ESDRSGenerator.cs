@@ -48,6 +48,7 @@ namespace TheAnnotator9000
         public List<Predicate> Pose; // Whether the body part is extended or not
         public List<Predicate> Orientation; // Position towards where the body part is facing
         public List<Predicate> Separation; // Whether the body part is separated (usually for fingers)
+        public List<Predicate> ExtraPredicates; // For extra predicates
         public Predicate Dependence; // Whether or not there is a dependence between hands
     };
 
@@ -122,6 +123,7 @@ namespace TheAnnotator9000
             newShape.Pose = new List<Predicate>();
             newShape.Orientation = new List<Predicate>();
             newShape.Separation = new List<Predicate>();
+            newShape.ExtraPredicates = new List<Predicate>();
             return newShape;
         }
 
@@ -145,7 +147,7 @@ namespace TheAnnotator9000
             variable.initialTime = pInitialTime;
             variable.finalTime = pFinalTime;
 
-            if (pType == "Individual")
+            if (pType == ConstantValues.g_IndividualString)
             {   
                 if(!g_IndividualVariables.TryGetValue(pName, out toSearch))
                      g_IndividualVariables.Add(pName, variable);
@@ -185,8 +187,8 @@ namespace TheAnnotator9000
                 {
                     Mapping tempMapping;
                     g_Mappings.TryGetValue(pArguments[argumentCounter], out tempMapping);
-                    tempVirtualMappings.Add(tempMapping);
                 }
+
                 argumentCounter++;
             }
 

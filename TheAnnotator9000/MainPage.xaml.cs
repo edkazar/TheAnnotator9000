@@ -96,7 +96,6 @@ namespace TheAnnotator9000
             g_FirstTimeIndVar = true;
 
             JArray g_AnnotatedGesturesID = new JArray();
-
             //IndVarComboBox.Items.Add("Ejemplo 2");
         }
 
@@ -238,14 +237,22 @@ namespace TheAnnotator9000
             return g_ESDRSGenerator.createPredicate(pName, sort, arguments);
         }
 
-        private Predicate Create2ArityPredicateAux(string pName, string pArgument1, string pArgument2)
+        private Predicate Create2ArityPredicateAux(string pName, string pArgument1, string pArgument2, bool isTrajectory)
         {
             List<string> arguments = new List<string>();
             arguments.Add(pArgument1);
             arguments.Add(pArgument2);
             List<Type> sort = new List<Type>();
-            sort.Add(typeof(Variable));
-            sort.Add(typeof(Variable));
+            if (isTrajectory)
+            {
+                sort.Add(typeof(Mapping));
+                sort.Add(typeof(Mapping));
+            }
+            else
+            {
+                sort.Add(typeof(Variable));
+                sort.Add(typeof(Variable));
+            }
             return g_ESDRSGenerator.createPredicate(pName, sort, arguments);
         }
 
@@ -276,7 +283,7 @@ namespace TheAnnotator9000
                     {
                         if(thisButton.Content.ToString() != "Gesture")
                         {
-                            Predicate newPred = Create1ArityPredicateAux(thisButton.Content.ToString(), ConstantValues.g_GestureString + g_SelectedGestureID);
+                            Predicate newPred = Create1ArityPredicateAux(thisButton.Content.ToString(), ConstantValues.g_GestureString);
                             g_CurrentGesture.TaxClass.Add(newPred);
                         }
                         else
@@ -370,7 +377,7 @@ namespace TheAnnotator9000
                 newVar = g_ESDRSGenerator.createVariable(g_CurrentArm + ConstantValues.g_HandString, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
                 g_CurrentShape.Variables.Add(newVar);
 
-                Predicate component = Create2ArityPredicateAux(ConstantValues.g_ComponentString, newVar.name, g_CurrentArm + ConstantValues.g_ArmString);
+                Predicate component = Create2ArityPredicateAux(ConstantValues.g_ComponentString, newVar.name, g_CurrentArm + ConstantValues.g_ArmString, false);
                 g_CurrentShape.Component.Add(component);
 
                 HandPoseText.Visibility = Visibility.Collapsed;
@@ -378,7 +385,7 @@ namespace TheAnnotator9000
             }
 
             Predicate newPred = Create1ArityPredicateAux(newVar.name, newVar.name);  
-            g_CurrentShape.Pose.Add(newPred);
+            g_CurrentShape.ExtraPredicates.Add(newPred);
 
             ExtendedPoseButton.Visibility = Visibility.Collapsed;
             SemiExtendedPoseButton.Visibility = Visibility.Collapsed;
@@ -398,14 +405,7 @@ namespace TheAnnotator9000
 
             if (ArmOrientationText.Visibility == Visibility.Visible)
             {
-                if (g_CurrentArm == ConstantValues.g_RightString)
-                {
-                    newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), ConstantValues.g_RightString + ConstantValues.g_ArmString);
-                }
-                else
-                {
-                    newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), ConstantValues.g_LeftString + ConstantValues.g_ArmString);
-                }
+                newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), g_CurrentArm + ConstantValues.g_ArmString);
 
                 ArmOrientationText.Visibility = Visibility.Collapsed;
                 HandPoseText.Visibility = Visibility.Visible;
@@ -415,14 +415,7 @@ namespace TheAnnotator9000
             }
             else if (HandOrientationText.Visibility == Visibility.Visible)
             {
-                if (g_CurrentArm == ConstantValues.g_RightString)
-                {
-                    newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), ConstantValues.g_RightString + ConstantValues.g_HandString);
-                }
-                else
-                {
-                    newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), ConstantValues.g_LeftString + ConstantValues.g_HandString);
-                }
+                newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), g_CurrentArm + ConstantValues.g_HandString);
 
                 HandOrientationText.Visibility = Visibility.Collapsed;
                 LittleFingerText.Visibility = Visibility.Visible;
@@ -499,10 +492,10 @@ namespace TheAnnotator9000
             newVar = g_ESDRSGenerator.createVariable(varName, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
             g_CurrentShape.Variables.Add(newVar);
 
-            Predicate component = Create2ArityPredicateAux(ConstantValues.g_ComponentString, newVar.name, g_CurrentArm + ConstantValues.g_HandString);
+            Predicate component = Create2ArityPredicateAux(ConstantValues.g_ComponentString, newVar.name, g_CurrentArm + ConstantValues.g_HandString, false);
             g_CurrentShape.Component.Add(component);
 
-            Predicate newPred = Create1ArityPredicateAux(newVar.name + ConstantValues.g_PoseString + selectedButton.Content.ToString(), newVar.name);
+            Predicate newPred = Create1ArityPredicateAux(ConstantValues.g_PoseString + selectedButton.Content.ToString(), newVar.name);
             g_CurrentShape.Pose.Add(newPred);
         }
 
@@ -565,7 +558,7 @@ namespace TheAnnotator9000
                 DoneSeparatingButton.Visibility = Visibility.Visible;
             }
 
-            Predicate newPred = Create1ArityPredicateAux(predName + ConstantValues.g_OrientationString + selectedButton.Content.ToString(), predName);
+            Predicate newPred = Create1ArityPredicateAux(ConstantValues.g_OrientationString + selectedButton.Content.ToString(), predName);
             g_CurrentShape.Orientation.Add(newPred);
         }
 
@@ -585,9 +578,13 @@ namespace TheAnnotator9000
                 LeftArmText.Visibility = Visibility.Collapsed;
                 YesButton.Visibility = Visibility.Collapsed;
                 NoButton.Visibility = Visibility.Collapsed;
-                isDependentText.Visibility = Visibility.Visible;
-                YesDependentButton.Visibility = Visibility.Visible;
-                NoDependentButton.Visibility = Visibility.Visible;
+
+                if (g_RightExists && g_LeftExists)
+                {
+                    isDependentText.Visibility = Visibility.Visible;
+                    YesDependentButton.Visibility = Visibility.Visible;
+                    NoDependentButton.Visibility = Visibility.Visible;
+                }
             }
 
             FingerSeparationText.Visibility = Visibility.Collapsed;
@@ -616,7 +613,7 @@ namespace TheAnnotator9000
             {
                 Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_FingerString + ConstantValues.g_SeparatedString,
                     g_CurrentArm + LittleFingerText.Text + ConstantValues.g_FingerString,
-                    g_CurrentArm + RingFingerText.Text + ConstantValues.g_FingerString);
+                    g_CurrentArm + RingFingerText.Text + ConstantValues.g_FingerString, false);
                 g_CurrentShape.Separation.Add(newPred);
             }
 
@@ -624,7 +621,7 @@ namespace TheAnnotator9000
             {
                 Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_FingerString + ConstantValues.g_SeparatedString,
                     g_CurrentArm + RingFingerText.Text + ConstantValues.g_FingerString,
-                    g_CurrentArm + MiddleFingerText.Text + ConstantValues.g_FingerString);
+                    g_CurrentArm + MiddleFingerText.Text + ConstantValues.g_FingerString, false);
                 g_CurrentShape.Separation.Add(newPred);
             }
 
@@ -632,7 +629,7 @@ namespace TheAnnotator9000
             {
                 Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_FingerString + ConstantValues.g_SeparatedString,
                     g_CurrentArm + MiddleFingerText.Text + ConstantValues.g_FingerString,
-                    g_CurrentArm + IndexFingerText.Text + ConstantValues.g_FingerString);
+                    g_CurrentArm + IndexFingerText.Text + ConstantValues.g_FingerString, false);
                 g_CurrentShape.Separation.Add(newPred);
             }
 
@@ -640,7 +637,7 @@ namespace TheAnnotator9000
             {
                 Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_FingerString + ConstantValues.g_SeparatedString,
                     g_CurrentArm + IndexFingerText.Text + ConstantValues.g_FingerString,
-                    g_CurrentArm + ThumbFingerText.Text + ConstantValues.g_FingerString);
+                    g_CurrentArm + ThumbFingerText.Text + ConstantValues.g_FingerString, false);
                 g_CurrentShape.Separation.Add(newPred);
             }
         }
@@ -652,7 +649,7 @@ namespace TheAnnotator9000
             if (selectedButton.Content.ToString() == "Yes")
             {
                 Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_DependenceString,
-                    ConstantValues.g_RightString + ConstantValues.g_GestureString, ConstantValues.g_LeftString + ConstantValues.g_GestureString);
+                    ConstantValues.g_RightString + ConstantValues.g_GestureString, ConstantValues.g_LeftString + ConstantValues.g_GestureString, false);
                 g_CurrentShape.Dependence = newPred;
             }
 
@@ -707,6 +704,8 @@ namespace TheAnnotator9000
 
         private void DoneNumPlaceholdersButton_Click(object sender, RoutedEventArgs e)
         {
+            //I AM GETTING AN EXCEPTION HERE, AFTER ADDING THE MAPPING PART. CHECK
+
             if(NumPlaceholdersTextbox.Text != "")
             {
                 ErrorTrajectoryMessageText.Visibility = Visibility.Collapsed;
@@ -721,17 +720,23 @@ namespace TheAnnotator9000
 
                     if (firstPoint)
                     {
-                        Spatiotemporal firstPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 1).ToString(), 0, 0, 0, new TimeSpan());
+                        string firstPointName = g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 1).ToString();
+                        Spatiotemporal firstPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(firstPointName, 0, 0, 0, new TimeSpan());
                         g_CurrentMovement.Points.Add(firstPlaceholderPoint);
+                        Mapping firstNewMapping = g_ESDRSGenerator.createMapping(firstPointName, new Matrix3D(), firstPointName);
+                        g_CurrentGesture.Mappings.Add(firstNewMapping);
                         firstPoint = false;
                     }
-                    
+
+                    string pointName = g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 1).ToString();
                     Spatiotemporal newPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 2).ToString(), 0, 0, 0, new TimeSpan());
                     g_CurrentMovement.Points.Add(newPlaceholderPoint);
+                    Mapping newMapping = g_ESDRSGenerator.createMapping(pointName, new Matrix3D(), pointName);
+                    g_CurrentGesture.Mappings.Add(newMapping);
 
                     Variable newTraj = g_ESDRSGenerator.createVariable(g_CurrentArm + ConstantValues.g_TrajectoryString + (counter + 1).ToString(), ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
                     g_CurrentMovement.Variables.Add(newTraj);
-                    Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_TrajectoryString, g_CurrentArm + g_CurrentMovement.Points[counter].name, g_CurrentArm + g_CurrentMovement.Points[counter + 1].name);
+                    Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_TrajectoryString, g_CurrentMovement.Points[counter].name, g_CurrentMovement.Points[counter + 1].name, true);
                     g_CurrentMovement.Trajectories.Add(newPred);
                 }
 
@@ -756,7 +761,7 @@ namespace TheAnnotator9000
         {
             Button selectedButton = sender as Button;
 
-            Predicate newPred = Create1ArityPredicateAux(g_CurrentArm + ConstantValues.g_MainPlaneString + selectedButton.Content.ToString(), g_CurrentArm + ConstantValues.g_GestureString);
+            Predicate newPred = Create1ArityPredicateAux(ConstantValues.g_MainPlaneString + selectedButton.Content.ToString(), g_CurrentArm + ConstantValues.g_GestureString);
             g_CurrentMovement.MainPlane = newPred;
 
             DescribePlaneOfMotion.Visibility = Visibility.Collapsed;
@@ -781,7 +786,7 @@ namespace TheAnnotator9000
                     if (thisButton.IsChecked == true)
                     {
                         // create
-                        Predicate newPred = Create1ArityPredicateAux(ConstantValues.g_DirectionString + thisButton.Content, g_CurrentMovement.Trajectories[g_CurrentPlaceholder - 1].name);
+                        Predicate newPred = Create1ArityPredicateAux(ConstantValues.g_DirectionString + thisButton.Content, g_CurrentMovement.Variables[g_CurrentPlaceholder - 1].name);
                         g_CurrentMovement.Directions.Add(newPred);                        
                     }
 
@@ -885,7 +890,7 @@ namespace TheAnnotator9000
         {
             if (IndVarComboBox.SelectedItem != null)
             {
-                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_ExemplifiesString, g_CurrentArm + ConstantValues.g_GestureString, IndVarComboBox.SelectedItem.ToString());
+                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_ExemplifiesString, g_CurrentArm + ConstantValues.g_GestureString, IndVarComboBox.SelectedItem.ToString(), false);
                 g_CurrentGesture.Exemplifies.Add(newPred);
 
                 if (g_CurrentArm == ConstantValues.g_RightString)
@@ -1009,10 +1014,8 @@ namespace TheAnnotator9000
             if(EventualityTextbox.Text != "")
             {
                 // NEED TO DEFINE TIMES
-                Variable newVar = g_ESDRSGenerator.createVariable(IndividualTextbox.Text, ConstantValues.g_EventualityString, new TimeSpan(), new TimeSpan());
+                Variable newVar = g_ESDRSGenerator.createVariable(EventualityTextbox.Text, ConstantValues.g_EventualityString, new TimeSpan(), new TimeSpan());
                 g_CurrentGesture.ContextVars.Add(newVar);
-                Predicate newPred = Create1ArityPredicateAux(newVar.name, newVar.name);
-                g_CurrentGesture.ContextPreds.Add(newPred);
 
                 EventVarComboBox.Items.Add(EventualityTextbox.Text);
                 IndVarComboBox2.SelectedItem = null;
@@ -1036,7 +1039,7 @@ namespace TheAnnotator9000
         {
             if (EventVarComboBox.SelectedItem != null)
             {
-                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_SynchroString, EventVarComboBox.SelectedItem.ToString(), ConstantValues.g_GestureString);
+                Predicate newPred = Create2ArityPredicateAux(ConstantValues.g_SynchroString, EventVarComboBox.SelectedItem.ToString(), ConstantValues.g_GestureString, false);
                 g_CurrentGesture.Synchro = newPred;
 
                 EventVarComboBox.SelectedItem = null;
@@ -1138,10 +1141,9 @@ namespace TheAnnotator9000
             if(PhysicalLocTextbox.Text != "")
             {
                 // Add coordinates and time
-                Spatiotemporal newPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(PhysicalLocTextbox.Text + ConstantValues.g_SpatiotempString, 0, 0, 0, new TimeSpan());
+                Spatiotemporal newPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(PhysicalLocTextbox.Text, 0, 0, 0, new TimeSpan());
                 g_CurrentGesture.Spatiotemporals.Add(newPlaceholderPoint);
-                Mapping newMapping = g_ESDRSGenerator.createMapping(PhysicalLocTextbox.Text + ConstantValues.g_MappingString,
-                    new Matrix3D(), PhysicalLocTextbox.Text + ConstantValues.g_SpatiotempString);
+                Mapping newMapping = g_ESDRSGenerator.createMapping(PhysicalLocTextbox.Text, new Matrix3D(), PhysicalLocTextbox.Text);
                 g_CurrentGesture.Mappings.Add(newMapping);
 
                 PhysicalLocComboBox.Items.Add(PhysicalLocTextbox.Text);
@@ -1209,7 +1211,13 @@ namespace TheAnnotator9000
             GestureIDTextInstruction5.Visibility = Visibility.Visible;
             QuitButton.Visibility = Visibility.Visible;
 
-            saveCurrentGestureAnnotation();
+            // Constructs a JSON from the current gesture annotation
+            JObject toSave = constructionJSONfromAnnotation();
+
+            // Saves the created JSON to a file
+            saveCurrentGestureAnnotation(toSave);
+
+            // Saves the selected gesture ID to the file of annotated gestures
             saveGestureIDtoFile();
         }
 
@@ -1241,75 +1249,72 @@ namespace TheAnnotator9000
             await FileIO.WriteTextAsync(file, string_to_send);
         }
 
-        private void saveCurrentGestureAnnotation()
+        private JObject constructionJSONfromAnnotation()
         {
-            /*
-            public string name; // For ease purposes, not part of structure                             YES
-            public List<Variable> Variables; // Variables created or used by the gesture                YES
-            public List<Variable> ContextVars; // For variables of previous utterances                  YES
-            public List<Predicate> ContextPreds; // For variables of previous utterances                YES
-            public List<Predicate> TaxClass; // Taxonomy class of the gesture                           NO
-            public List<GestureShape> Shape; // Struct describing the gesture's shape                   NO
-            public GestureMovement Movement; // Struct describing the gesture's movement                NO
-            public List<Predicate> Exemplifies; // Semantic concepts described by the gesture           NO
-            public Predicate Synchro; // Whether or not the gesture is synchronized with an event       NO
-            public List<Predicate> Loc; // Spatiotemporal information of the gesture                    NO
-            public List<Predicate> ExtraPredicates; // For extra predicates                             NO
-            public List<Spatiotemporal> Spatiotemporals;                                                YES
-            public List<Mapping> Mappings;                                                              YES
-            */
             JObject GestureAnnotation = new JObject();
             JObject GestureContext = new JObject();
-            JObject ContextVariables = new JObject();
-            JArray ContextIndividualVariables = new JArray();
-            JArray ContextEventualityVariables = new JArray();
             JArray ContextPredicates = new JArray();
-  
-            GestureAnnotation["Name"] = g_CurrentGesture.name;
-            assembleJSONVariables(g_CurrentGesture.Variables, GestureAnnotation);
-            assembleJSONSpatiotemporal(g_CurrentGesture.Spatiotemporals, GestureAnnotation);
-            assembleJSONMapping(g_CurrentGesture.Mappings, GestureAnnotation);
-
-            assembleJSONVariables(g_CurrentGesture.ContextVars, GestureContext);
-            assembleJSONPredicateList(g_CurrentGesture.ContextPreds, ContextPredicates);
-            GestureContext.Add("Predicates", ContextPredicates);
-            GestureAnnotation["Context"] = GestureContext;
-
             JObject GesturePredicates = new JObject();
             JArray TaxClassPredicates = new JArray();
             JArray GestureShapes = new JArray();
-
             JObject GestureMovement = new JObject();
-            JObject MovementVariables = new JObject();
-            JArray MovementIndividualVariables = new JArray();
-            JArray MovementEventualityVariables = new JArray();
-            JArray MovementPoints = new JArray();
-            JArray MovementTrajectories = new JArray();
-            JArray MovementDirections = new JArray();
-
             JArray ExemplifiesPredicates = new JArray();
             JObject SynchroPredicate = new JObject();
             JArray LocPredicates = new JArray();
+            JArray ExtraPredicates = new JArray();
 
-            assembleJSONPredicateList(g_CurrentGesture.TaxClass, TaxClassPredicates);
+            // -------------- Main Gesture -------------- //
+            GestureAnnotation["Name"] = g_CurrentGesture.name; // Adding Gesture Name
+            assembleJSONVariables(g_CurrentGesture.Variables, GestureAnnotation); // Adding Gesture Variables
+            assembleJSONSpatiotemporal(g_CurrentGesture.Spatiotemporals, GestureAnnotation);  // Adding Gesture Spatiotemporals
+            assembleJSONMapping(g_CurrentGesture.Mappings, GestureAnnotation);  // Adding Gesture Mappings
+
+            // -------------- Gesture Context -------------- //
+            assembleJSONVariables(g_CurrentGesture.ContextVars, GestureContext); // Adding Context Variables
+            assembleJSONPredicateList(g_CurrentGesture.ContextPreds, ContextPredicates); // Adding Context Predicates
+            GestureContext.Add("Predicates", ContextPredicates);
+            GestureAnnotation["Context"] = GestureContext; // Adding Context
+
+            // -------------- Gesture Predicates -------------- //
+            // -------------- Gesture Taxonomy -------------- //
+            assembleJSONPredicateList(g_CurrentGesture.TaxClass, TaxClassPredicates); // Adding Taxonomy Predicates
             GesturePredicates.Add("Taxonomies", TaxClassPredicates);
 
-            assembleJSONShapeList(g_CurrentGesture.Shape, GestureShapes);
-            GesturePredicates.Add("Shape", GestureShapes);
+            // -------------- Gesture Shape -------------- //
+            assembleJSONShapeList(g_CurrentGesture.Shape, GestureShapes); // Adding Shape (see function)
+            GesturePredicates.Add("Shapes", GestureShapes);
 
-            assembleJSONVariables(g_CurrentGesture.Movement.Variables, GestureMovement);
-
-            assembleJSONSpatiotemporal(g_CurrentGesture.Movement.Points, GestureMovement);
-
-            GestureMovement["MainPlane"] = assembleJSONPredicate(g_CurrentGesture.Movement.MainPlane);
-
-            assembleJSONPredicateList(g_CurrentGesture.TaxClass, MovementTrajectories);
-            GestureMovement.Add("Trajectories", MovementTrajectories);
-
-            assembleJSONPredicateList(g_CurrentGesture.TaxClass, MovementDirections);
-            GestureMovement.Add("Directions", MovementDirections);
-
+            // -------------- Gesture Movement -------------- //
+            assembleJSONMovement(g_CurrentGesture.Movement, GestureMovement); // Adding Movement (see function)
             GesturePredicates["Movement"] = GestureMovement;
+
+            // -------------- Gesture Exemplifies -------------- //
+            assembleJSONPredicateList(g_CurrentGesture.Exemplifies, ExemplifiesPredicates); // Adding Exemplify Predicates
+            GesturePredicates.Add("Exemplifies", ExemplifiesPredicates);
+
+            // -------------- Gesture Synchro -------------- //
+            GesturePredicates["Synchro"] = assembleJSONPredicate(g_CurrentGesture.Synchro);  // Adding Synchro Predicates
+
+            // -------------- Gesture Locs -------------- //
+            assembleJSONPredicateList(g_CurrentGesture.Loc, LocPredicates); // Adding Loc Predicates
+            GesturePredicates.Add("Locs", LocPredicates);
+
+            // -------------- Gesture Extras -------------- //
+            assembleJSONPredicateList(g_CurrentGesture.ExtraPredicates, ExtraPredicates); // Adding Extra Predicates
+            GesturePredicates.Add("Extras", ExtraPredicates);
+
+            GestureAnnotation["Predicates"] = GesturePredicates; // Adding Predicates
+
+            return GestureAnnotation;
+        }
+
+        private async void saveCurrentGestureAnnotation(JObject objToBuild)
+        {
+            //save gesture id to annotated id file
+            string filepath = @"JSONs\"+ g_SelectedGestureID + ".json";
+            StorageFile file = await g_RootFolder.CreateFileAsync(filepath, CreationCollisionOption.OpenIfExists);
+            string string_to_send = JsonConvert.SerializeObject(objToBuild, Formatting.Indented);
+            await FileIO.WriteTextAsync(file, string_to_send);
         }
 
         private void assembleJSONVariables(List<Variable> varList, JObject objToAppend)
@@ -1320,10 +1325,18 @@ namespace TheAnnotator9000
 
             foreach (Variable var in varList)
             {
-                if (var.type == ConstantValues.g_IndividualString)
-                    IndividualArray.Add(var.name);
+                JObject newVar = new JObject();
+                newVar["Name"] = var.name;
+
+                if (var.type == ConstantValues.g_EventualityString)
+                {
+                    newVar["InitialTime"] = var.initialTime;
+                    newVar["FinalTime"] = var.finalTime;
+                    EventualityArray.Add(newVar);
+                }
+
                 else
-                    EventualityArray.Add(var.name);
+                    IndividualArray.Add(newVar);
             }
 
             Variables.Add("IndividualVariables", IndividualArray);
@@ -1344,7 +1357,7 @@ namespace TheAnnotator9000
                 Coordinates.Add(var.posY);
                 Coordinates.Add(var.posZ);
                 Spatiotemporal.Add("Coordinates", Coordinates);
-                Spatiotemporal["Time"] = var.time.Seconds.ToString();
+                Spatiotemporal["Time"] = var.time;
                 spatiotemporals.Add(Spatiotemporal);
             }
 
@@ -1371,17 +1384,13 @@ namespace TheAnnotator9000
         {
             JObject predicate = new JObject();
             JArray sortArray = new JArray();
-            JObject predicateVars = new JObject();
-            JArray predicateMaps = new JArray();
-            JArray predIndVar = new JArray();
-            JArray predEvenVar = new JArray();
 
             predicate["Name"] = pPred.name;
             predicate["Arity"] = pPred.arity;
 
             foreach (Type sort in pPred.sort)
             {
-                sortArray.Add(sort.ToString());
+                sortArray.Add(sort.Name);
             }
             predicate.Add("Sort", sortArray);
 
@@ -1436,6 +1445,23 @@ namespace TheAnnotator9000
                 JObject gShape = assembleJSONShape(shape);
                 arrayToAppend.Add(gShape);
             }
+        }
+
+        private void assembleJSONMovement(GestureMovement pMovement, JObject objToAppend)
+        {
+            JArray MovementTrajectories = new JArray();
+            JArray MovementDirections = new JArray();
+
+            assembleJSONVariables(pMovement.Variables, objToAppend);
+            assembleJSONSpatiotemporal(pMovement.Points, objToAppend);
+
+            objToAppend["MainPlane"] = assembleJSONPredicate(pMovement.MainPlane);
+
+            assembleJSONPredicateList(pMovement.Trajectories, MovementTrajectories);
+            objToAppend.Add("Trajectories", MovementTrajectories);
+
+            assembleJSONPredicateList(pMovement.Directions, MovementDirections);
+            objToAppend.Add("Directions", MovementDirections);
         }
     }
 }
