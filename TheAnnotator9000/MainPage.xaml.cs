@@ -585,6 +585,11 @@ namespace TheAnnotator9000
                     YesDependentButton.Visibility = Visibility.Visible;
                     NoDependentButton.Visibility = Visibility.Visible;
                 }
+                else
+                {
+                    AnotherShapeButton.Visibility = Visibility.Visible;
+                    ShapeDoneButton.Visibility = Visibility.Visible;
+                }
             }
 
             FingerSeparationText.Visibility = Visibility.Collapsed;
@@ -704,8 +709,6 @@ namespace TheAnnotator9000
 
         private void DoneNumPlaceholdersButton_Click(object sender, RoutedEventArgs e)
         {
-            //I AM GETTING AN EXCEPTION HERE, AFTER ADDING THE MAPPING PART. CHECK
-
             if(NumPlaceholdersTextbox.Text != "")
             {
                 ErrorTrajectoryMessageText.Visibility = Visibility.Collapsed;
@@ -728,8 +731,8 @@ namespace TheAnnotator9000
                         firstPoint = false;
                     }
 
-                    string pointName = g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 1).ToString();
-                    Spatiotemporal newPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 2).ToString(), 0, 0, 0, new TimeSpan());
+                    string pointName = g_CurrentArm + ConstantValues.g_PlaceholderPointString + (counter + 2).ToString();
+                    Spatiotemporal newPlaceholderPoint = g_ESDRSGenerator.createSpatiotemporal(pointName, 0, 0, 0, new TimeSpan());
                     g_CurrentMovement.Points.Add(newPlaceholderPoint);
                     Mapping newMapping = g_ESDRSGenerator.createMapping(pointName, new Matrix3D(), pointName);
                     g_CurrentGesture.Mappings.Add(newMapping);

@@ -187,6 +187,7 @@ namespace TheAnnotator9000
                 {
                     Mapping tempMapping;
                     g_Mappings.TryGetValue(pArguments[argumentCounter], out tempMapping);
+                    tempVirtualMappings.Add(tempMapping);
                 }
 
                 argumentCounter++;
@@ -222,11 +223,10 @@ namespace TheAnnotator9000
             tempMapping.transformation = pMatrix;
 
             Spatiotemporal tempSpatiotemporal;
-            g_Spatiotemporals.TryGetValue(pSpatiotemporal, out tempSpatiotemporal);
+            bool found = g_Spatiotemporals.TryGetValue(pSpatiotemporal, out tempSpatiotemporal);
             tempMapping.physicalLocation = tempSpatiotemporal;
-
+            Debug.WriteLine(found);
             g_Mappings.Add(pName, tempMapping);
-
             return tempMapping;
         }
     }
