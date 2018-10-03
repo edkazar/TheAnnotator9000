@@ -10,11 +10,11 @@
 
     <Grid>
         <TextBlock x:Name="GreetingMessageText" HorizontalAlignment="Center" Margin="0,155,0,0" Text="Welcome to the Annotator 9000" TextWrapping="Wrap" FontSize="110" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
-        <TextBox x:Name="UsernameTextbox" Height="16" Margin="0,443,0,0" Text="" VerticalAlignment="Top" PlaceholderText="Username" HorizontalAlignment="Center" Width="215" Visibility="Collapsed"/>
-        <PasswordBox x:Name="PasswordTextbox" Height="34" Margin="0,563,0,0" VerticalAlignment="Top" PlaceholderText="Password" HorizontalAlignment="Center" Width="210" Visibility="Collapsed"/>
+        <TextBox x:Name="UsernameTextbox" Height="16" Text="Edkazar" Margin="0,443,0,0" VerticalAlignment="Top" PlaceholderText="Username" HorizontalAlignment="Center" Width="215" Visibility="Collapsed"/>
+        <PasswordBox x:Name="PasswordTextbox" Height="34" Margin="0,563,0,0" VerticalAlignment="Top" PlaceholderText="Password" HorizontalAlignment="Center" Width="210" Visibility="Collapsed" Password="jarom217"/>
         <Button x:Name="ButtonLogin" Content="Login" HorizontalAlignment="Center" Margin="0,664,0,0" VerticalAlignment="Top" Height="63" Width="209" FontSize="24" Click="ButtonLogin_Click" Visibility="Collapsed"/>
 
-        <TextBox x:Name="GestureIDTextbox" Height="16" Margin="265,155,0,0" Text="" VerticalAlignment="Top" PlaceholderText="GestureID" HorizontalAlignment="Left" Width="215" Visibility="Collapsed"/>
+        <TextBox x:Name="GestureIDTextbox" Height="16" Margin="265,155,0,0" Text="1120" VerticalAlignment="Top" PlaceholderText="GestureID" HorizontalAlignment="Left" Width="215" Visibility="Collapsed"/>
         <Button x:Name="GestureIDButton" Content="Select" HorizontalAlignment="Left" Margin="121,155,0,0" VerticalAlignment="Top" Height="32" Width="105" Click="GestureIDButton_Click" Visibility="Collapsed"/>
         <TextBlock x:Name="ErrorMessageText" HorizontalAlignment="Left" Margin="173,206,0,0" Text="No Gesture Found with Specified ID" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>
         <TextBlock x:Name="RepeatedGestureMessageText" HorizontalAlignment="Left" Margin="173,206,0,0" Text="This gesture was already annotated" TextWrapping="Wrap" VerticalAlignment="Top" FontWeight="Bold" Visibility="Collapsed"/>

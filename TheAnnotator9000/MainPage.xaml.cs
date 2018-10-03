@@ -59,6 +59,10 @@ namespace TheAnnotator9000
 
         private bool g_FirstTimeIndVar;
 
+        private int g_NodeID;
+        private JArray g_Nodes;
+        private JArray g_Edges;
+
         public MainPage()
         {
             this.InitializeComponent();
@@ -96,8 +100,11 @@ namespace TheAnnotator9000
             g_FirstTimeIndVar = true;
 
             JArray g_AnnotatedGesturesID = new JArray();
-            //IndVarComboBox.Items.Add("Ejemplo 2");
-        }
+
+            g_NodeID = -1;
+            g_Nodes = new JArray();
+            g_Edges = new JArray();
+    }
 
         private void ButtonLogin_Click(object sender, RoutedEventArgs e)
         {
@@ -187,7 +194,7 @@ namespace TheAnnotator9000
 
         private async void loadGestureDatabase()
         {
-            string filepath = @"JSONs\testJSON2.json";
+            string filepath = @"JSONs\GesturesForPaper.json";
             StorageFile file = await g_RootFolder.GetFileAsync(filepath);
             var data = await FileIO.ReadTextAsync(file);
             g_GestureDatabase = JArray.Parse(data);
@@ -196,9 +203,9 @@ namespace TheAnnotator9000
         private async void gestureVideoPlayback(JObject pSelectedGesture)
         {
             string filepath = @"Videos\";
-            filepath = filepath + pSelectedGesture["Gesture Code"].ToString()[0];
-            filepath = filepath + pSelectedGesture["Gesture Code"].ToString()[0];
-            filepath += pSelectedGesture["Gesture Code"].ToString()[2] + ".avi";
+            filepath += pSelectedGesture["Gesture Code"].ToString()[0];
+            filepath += pSelectedGesture["Gesture Code"].ToString()[2];
+            filepath += pSelectedGesture["Gesture Code"].ToString()[1] + ".avi";
 
             StorageFile file = await g_RootFolder.GetFileAsync(filepath);
             GestureRecording.SetMediaPlayer(g_MediaPlayer);
@@ -206,10 +213,10 @@ namespace TheAnnotator9000
             g_MediaPlayer.PlaybackSession.Position = TimeSpan.FromSeconds(Convert.ToInt32(pSelectedGesture["Gesture Spotted in Color at"]) - 2);
             g_MediaPlayer.Play();
 
-            SpeechTranscriptionText.Text = pSelectedGesture["Speech Context"].ToString();
+            SpeechTranscriptionText.Text = pSelectedGesture["Verbal Transcript"].ToString();
 
             DispatcherTimer timer = new DispatcherTimer();
-            timer.Interval = TimeSpan.FromSeconds(10);
+            timer.Interval = TimeSpan.FromSeconds(4);
             timer.Start();
             timer.Tick += (o, args) =>
             {
@@ -658,8 +665,7 @@ namespace TheAnnotator9000
                 g_CurrentShape.Dependence = newPred;
             }
 
-            g_CurrentGesture.Shape.Add(g_CurrentShape);
-            g_CurrentShape = g_ESDRSGenerator.createGestureShape();
+            
 
             isDependentText.Visibility = Visibility.Collapsed;
             YesDependentButton.Visibility = Visibility.Collapsed;
@@ -676,6 +682,9 @@ namespace TheAnnotator9000
             NoButton.Visibility = Visibility.Visible;
             g_CurrentArm = ConstantValues.g_RightString;
 
+            g_CurrentGesture.Shape.Add(g_CurrentShape);
+            g_CurrentShape = g_ESDRSGenerator.createGestureShape();
+
             AnotherShapeButton.Visibility = Visibility.Collapsed;
             ShapeDoneButton.Visibility = Visibility.Collapsed;
         }
@@ -684,6 +693,9 @@ namespace TheAnnotator9000
         {
             AnotherShapeButton.Visibility = Visibility.Collapsed;
             ShapeDoneButton.Visibility = Visibility.Collapsed;
+
+            g_CurrentGesture.Shape.Add(g_CurrentShape);
+            g_CurrentShape = g_ESDRSGenerator.createGestureShape();
 
             g_CurrentMovement = g_ESDRSGenerator.createGestureMovement();
             
@@ -985,7 +997,7 @@ namespace TheAnnotator9000
         {
             if (IndividualTextbox2.Text != "")
             {
-                Variable newVar = g_ESDRSGenerator.createVariable(IndividualTextbox.Text, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
+                Variable newVar = g_ESDRSGenerator.createVariable(IndividualTextbox2.Text, ConstantValues.g_IndividualString, new TimeSpan(), new TimeSpan());
                 g_CurrentGesture.ContextVars.Add(newVar);
                 Predicate newPred = Create1ArityPredicateAux(newVar.name, newVar.name);
                 g_CurrentGesture.ContextPreds.Add(newPred);
@@ -1181,11 +1193,18 @@ namespace TheAnnotator9000
 
                 if (g_CurrentArm == ConstantValues.g_RightString)
                 {
-                    g_CurrentArm = ConstantValues.g_LeftString;
+                    if (g_LeftExists)
+                    {
+                        g_CurrentArm = ConstantValues.g_LeftString;
 
-                    YesLocButton.Visibility = Visibility.Visible;
-                    NoLocButton.Visibility = Visibility.Visible;
-                    isLeftLocText.Visibility = Visibility.Visible;
+                        YesLocButton.Visibility = Visibility.Visible;
+                        NoLocButton.Visibility = Visibility.Visible;
+                        isLeftLocText.Visibility = Visibility.Visible;
+                    }
+                    else
+                    {
+                        DoneLocalizingButton.Visibility = Visibility.Visible;
+                    }
                 }
                 else
                 {
@@ -1215,10 +1234,16 @@ namespace TheAnnotator9000
             QuitButton.Visibility = Visibility.Visible;
 
             // Constructs a JSON from the current gesture annotation
-            JObject toSave = constructionJSONfromAnnotation();
+            //JObject toSave = constructionJSONfromAnnotation();
 
             // Saves the created JSON to a file
-            saveCurrentGestureAnnotation(toSave);
+            //saveCurrentGestureAnnotation(g_SelectedGestureID, toSave);
+
+            // Constructs a JSON in NetworkX format
+            JObject toSave2 = constructionNetworkXJSON();
+
+            // Saves the created JSON to a file
+            saveCurrentGestureAnnotation(g_SelectedGestureID+"NetworkX", toSave2);
 
             // Saves the selected gesture ID to the file of annotated gestures
             saveGestureIDtoFile();
@@ -1311,10 +1336,10 @@ namespace TheAnnotator9000
             return GestureAnnotation;
         }
 
-        private async void saveCurrentGestureAnnotation(JObject objToBuild)
+        private async void saveCurrentGestureAnnotation(string filename, JObject objToBuild)
         {
             //save gesture id to annotated id file
-            string filepath = @"JSONs\"+ g_SelectedGestureID + ".json";
+            string filepath = @"JSONs\ForPaper\"+ filename + ".json";
             StorageFile file = await g_RootFolder.CreateFileAsync(filepath, CreationCollisionOption.OpenIfExists);
             string string_to_send = JsonConvert.SerializeObject(objToBuild, Formatting.Indented);
             await FileIO.WriteTextAsync(file, string_to_send);
@@ -1465,6 +1490,364 @@ namespace TheAnnotator9000
 
             assembleJSONPredicateList(pMovement.Directions, MovementDirections);
             objToAppend.Add("Directions", MovementDirections);
+        }
+
+        private JObject constructionNetworkXJSON()
+        {
+            JObject GestureAnnotation = new JObject();
+
+            GestureAnnotation["directed"] = true;
+            GestureAnnotation["graph"] = new JObject();
+
+            string varNodeID = createNode("Gesture" + g_CurrentGesture.name); // Main Gesture
+
+            if(g_CurrentGesture.Variables.Count > 0)
+            {
+                assembleGraphVG(g_CurrentGesture.Variables, varNodeID);
+            }
+            if (g_CurrentGesture.Spatiotemporals.Count > 0)
+            {
+                assembleGraphSG(g_CurrentGesture.Spatiotemporals, varNodeID);
+            }
+            if (g_CurrentGesture.Mappings.Count > 0)
+            {
+                assembleGraphMG(g_CurrentGesture.Mappings, varNodeID);
+            }
+                
+            assembleGraphCG(varNodeID);
+            assembleGraphGPG(varNodeID);
+
+            GestureAnnotation.Add("nodes", g_Nodes);
+            GestureAnnotation.Add("links", g_Edges);
+            GestureAnnotation["multigraph"] = false;
+
+            return GestureAnnotation;
+        }
+
+        private void assembleGraphVG(List<Variable> varList, string parent)
+        {
+            string newVGnodeID = createNode("VG"); // Variable Group
+            string newIVGnodeID = "";
+            string newEVGnodeID = "";
+
+            bool indExists = false;
+            bool eventExists = false;
+
+            foreach (Variable var in varList)
+            {
+                if (var.type == ConstantValues.g_IndividualString)
+                {
+                    indExists = true;
+                }
+                else
+                {
+                    eventExists = true;
+                }
+            }
+
+            if(indExists)
+            {
+                newIVGnodeID = createNode("IVG"); // Individual Variable Group
+                createEdge(newVGnodeID, newIVGnodeID);
+            }
+            if(eventExists)
+            {
+                newEVGnodeID = createNode("EVG"); // Eventuality Variable Group          
+                createEdge(newVGnodeID, newEVGnodeID);
+            } 
+
+            foreach (Variable var in varList)
+            {
+                if(var.type == ConstantValues.g_IndividualString)
+                {
+                    string varNodeID = createNode("IV"); // Individual Variable
+                    string nameNodeID = createNode("NAME"); // Individual Variable Name 
+                    string actualValueNodeID = createNode(var.name); // Individual Variable Value
+
+                    createEdge(newIVGnodeID, varNodeID);
+                    createEdge(varNodeID, nameNodeID);
+                    createEdge(nameNodeID, actualValueNodeID);
+                }
+                else
+                {
+                    string varNodeID = createNode("EV"); // Eventuality Variable
+                    string nameNodeID = createNode("NAME"); // Eventuality Variable Name 
+                    string actualValueNodeID = createNode(var.name); // Eventuality Variable Value
+                    string initialTimeNodeID = createNode("TIME"); // Eventuality Variable Name 
+                    string actualValueNodeID2 = createNode(var.initialTime.ToString()); // Eventuality Variable Value
+                    string finalTimeNodeID = createNode("TIME"); // Eventuality Variable Name 
+                    string actualValueNodeID3 = createNode(var.finalTime.ToString()); // Eventuality Variable Value
+
+                    createEdge(newEVGnodeID, varNodeID);
+                    createEdge(varNodeID, nameNodeID);
+                    createEdge(varNodeID, initialTimeNodeID);
+                    createEdge(varNodeID, finalTimeNodeID);
+                    createEdge(nameNodeID, actualValueNodeID);
+                    createEdge(initialTimeNodeID, actualValueNodeID2);
+                    createEdge(finalTimeNodeID, actualValueNodeID3);
+                }
+
+            }
+
+            createEdge(parent, newVGnodeID);
+        }
+
+        private void assembleGraphSG(List<Spatiotemporal> spatiotempList, string parent)
+        {
+            string newSGnodeID = createNode("SG"); // Spatiotemporal Group
+
+            foreach (Spatiotemporal spatiotemp in spatiotempList)
+            {
+                string spatiotempNodeID = createNode("S"); // Spatiotemporal 
+                string nameNodeID = createNode("NAME"); // Spatiotemporal Name 
+                string actualValueNodeID = createNode(spatiotemp.name); // Spatiotemporal Name Value
+                string coordinatesNodeID = createNode("COORDINATES"); // Spatiotemporal Coordinates 
+                string coordinateXNodeID = createNode("CX"); // Spatiotemporal Coordinate X
+                string coordinateYNodeID = createNode("CY"); // Spatiotemporal Coordinates Y
+                string coordinateZNodeID = createNode("CZ"); // Spatiotemporal Coordinates Z
+                string actualValueNodeID2 = createNode(spatiotemp.posX.ToString()); // Spatiotemporal Coordinate X Value
+                string actualValueNodeID3 = createNode(spatiotemp.posY.ToString()); // Spatiotemporal Coordinate Y Value
+                string actualValueNodeID4 = createNode(spatiotemp.posZ.ToString()); // Spatiotemporal Coordinate Z Value
+                string timeNodeID = createNode("TIME"); // Spatiotemporal Time 
+                string actualValueNodeID6 = createNode(spatiotemp.time.ToString()); // Spatiotemporal Time Value
+
+                createEdge(newSGnodeID, spatiotempNodeID);
+                createEdge(spatiotempNodeID, nameNodeID);
+                createEdge(nameNodeID, actualValueNodeID);
+                createEdge(spatiotempNodeID, coordinatesNodeID);
+                createEdge(coordinatesNodeID, coordinateXNodeID);
+                createEdge(coordinatesNodeID, coordinateYNodeID);
+                createEdge(coordinatesNodeID, coordinateZNodeID);
+                createEdge(coordinateXNodeID, actualValueNodeID2);
+                createEdge(coordinateYNodeID, actualValueNodeID3);
+                createEdge(coordinateZNodeID, actualValueNodeID4);
+                createEdge(spatiotempNodeID, timeNodeID);
+                createEdge(timeNodeID, actualValueNodeID6);
+            }
+            createEdge(parent, newSGnodeID);
+        }
+
+        private void assembleGraphMG(List<Mapping> mapList, string parent)
+        {
+            if (mapList.Count > 0)
+            {
+                string newMGnodeID = createNode("MG"); // Mapping Group
+
+                foreach (Mapping map in mapList)
+                {
+                    string mapNodeID = createNode("M"); // Mapping
+                    string nameNodeID = createNode("NAME"); // Mapping Name 
+                    string actualValueNodeID = createNode(map.name); // Mapping Name Value
+                    string spatiotempNodeID = createNode("S"); // Spatiotemporal 
+                    string spatiotempnameNodeID = createNode("NAME"); // Spatiotemporal Name 
+                    string actualValueNodeID2 = createNode(map.physicalLocation.name); // Spatiotemporal Name Value
+                    string mapTransNodeID = createNode("TRANSFORMATION"); // Mapping Transformation 
+                    string actualValueNodeID3 = createNode("ToComplete"); // Mapping Transformation Value
+
+                    createEdge(newMGnodeID, mapNodeID);
+                    createEdge(mapNodeID, nameNodeID);
+                    createEdge(nameNodeID, actualValueNodeID);
+                    createEdge(mapNodeID, spatiotempNodeID);
+                    createEdge(spatiotempNodeID, spatiotempnameNodeID);
+                    createEdge(spatiotempnameNodeID, actualValueNodeID2);
+                    createEdge(mapNodeID, mapTransNodeID);
+                    createEdge(mapTransNodeID, actualValueNodeID3);
+                }
+                createEdge(parent, newMGnodeID);
+            }
+        }
+
+        private void assembleGraphCG(string parent)
+        {
+            if (g_CurrentGesture.ContextVars.Count > 0 || g_CurrentGesture.ContextPreds.Count > 0)
+            {
+                string newCGnodeID = createNode("CG"); // Context Group
+
+                if (g_CurrentGesture.ContextVars.Count > 0)
+                {
+                    assembleGraphVG(g_CurrentGesture.ContextVars, newCGnodeID);
+                }
+                if (g_CurrentGesture.ContextPreds.Count > 0)
+                {
+                    assembleGraphPG(g_CurrentGesture.ContextPreds, newCGnodeID);
+                }
+
+                createEdge(parent, newCGnodeID);
+            }
+        }
+
+        private void assembleGraphP(Predicate pred, string parent)
+        {
+            string predNodeID = createNode("P"); // Predicate
+            string nameNodeID = createNode("NAME"); // Predicate Name 
+            string actualValueNodeID = createNode(pred.name); // Predicate Name Value
+            string arityNodeID = createNode("ARITY"); // Predicate Arity 
+            string actualValueNodeID2 = createNode(pred.arity.ToString()); // Predicate Arity Value
+            string sortNodeID = createNode("SORT"); // Predicate Sort 
+
+            foreach (Type sortElem in pred.sort)
+            {
+                string typeString = sortElem.Name;
+
+                string typeNodeID = createNode("TYPE"); // Sort Type
+                string actualTypeNodeID = createNode(typeString); // Sort Type Value
+
+                createEdge(sortNodeID, typeNodeID);
+                createEdge(typeNodeID, actualTypeNodeID);
+            }
+
+            assembleGraphVG(pred.variables, predNodeID);
+            assembleGraphMG(pred.virtualMappings, predNodeID);
+
+            createEdge(parent, predNodeID);
+            createEdge(predNodeID, nameNodeID);
+            createEdge(nameNodeID, actualValueNodeID);
+            createEdge(predNodeID, arityNodeID);
+            createEdge(arityNodeID, actualValueNodeID2);
+            createEdge(predNodeID, sortNodeID);
+        }
+
+        private void assembleGraphPG(List<Predicate> predList, string parent)
+        {
+            string newPGnodeID = createNode("PG"); // Predicate Group
+
+            foreach(Predicate pred in predList)
+            {
+                assembleGraphP(pred, newPGnodeID);
+            }
+            createEdge(parent,newPGnodeID);
+        }
+
+        private void assembleGraphGPG(string parent)
+        {
+            string newGPGnodeID = createNode("LPG"); // Large Predicate Group
+            string newTPGnodeID = createNode("TaG"); // Taxonomy Predicate Group
+            
+            assembleGraphPG(g_CurrentGesture.TaxClass, newTPGnodeID);
+
+            Debug.WriteLine("Count");
+            Debug.WriteLine(g_CurrentGesture.Shape.Count);
+            if (g_CurrentGesture.Shape.Count > 0)
+            {
+                assembleGraphSPG(g_CurrentGesture.Shape, newGPGnodeID);
+            }
+
+            assembleGraphMov(g_CurrentGesture.Movement, newGPGnodeID);
+
+            if (g_CurrentGesture.Exemplifies.Count > 0)
+            {
+                string newEPGnodeID = createNode("ExG"); // Exemplifies Predicate Group
+                assembleGraphPG(g_CurrentGesture.Exemplifies, newEPGnodeID);
+                createEdge(newGPGnodeID, newEPGnodeID);
+            }
+
+            if (!g_CurrentGesture.Synchro.Equals(default(Predicate)))
+            {
+                string newSyPGnodeID = createNode("SyG"); // Synchro Predicate Group
+                assembleGraphP(g_CurrentGesture.Synchro, newSyPGnodeID);
+                createEdge(newGPGnodeID, newSyPGnodeID);
+            }
+
+            if (g_CurrentGesture.Loc.Count > 0)
+            {
+                string newLPGnodeID = createNode("LoG"); // Loc Predicate Group
+                assembleGraphPG(g_CurrentGesture.Loc, newLPGnodeID);
+                createEdge(newGPGnodeID, newLPGnodeID);
+            }
+
+            assembleGraphPG(g_CurrentGesture.ExtraPredicates, newGPGnodeID);
+
+            createEdge(newGPGnodeID, newTPGnodeID);
+
+            createEdge(parent, newGPGnodeID);
+        }
+
+        private void assembleGraphSPG(List<GestureShape> shapeList, string parent)
+        {
+            string newSPGnodeID = createNode("ShG"); // Shape Predicate Group
+
+            foreach(GestureShape shape in shapeList)
+            {
+                string shapeNodeID = createNode("Sh"); // Shape Group
+                assembleGraphVG(shape.Variables, shapeNodeID); // Shape Variables
+                assembleGraphShPG(shape, shapeNodeID); // Shape Predicates
+
+                createEdge(newSPGnodeID, shapeNodeID);
+            }
+            createEdge(parent, newSPGnodeID);
+        }
+
+        private void assembleGraphShPG(GestureShape shape, string parent)
+        {
+            string newLPGnodeID = createNode("ShPG"); // Large Predicate Group
+            string newComponentNodeID = createNode("COMPONENT"); // Shape Component Predicates
+            string newPosesNodeID = createNode("POSE"); // Shape Poses Predicates     
+            string newOrientationNodeID = createNode("ORIENTATION"); // Shape Orientations Predicates
+            
+            if(shape.Separation.Count > 0)
+            {
+                string newSeparationNodeID = createNode("SEPARATION"); // Shape Separations Predicates
+                assembleGraphPG(shape.Separation, newSeparationNodeID);
+                createEdge(newLPGnodeID, newSeparationNodeID);
+            }
+            if(!shape.Dependence.Equals(default(Predicate)))
+            {
+                string newDependenceNodeID = createNode("DEPENDENCE"); // Shape Dependence Predicate
+                assembleGraphP(shape.Dependence, newDependenceNodeID);
+                createEdge(newLPGnodeID, newDependenceNodeID);
+            }
+
+            assembleGraphPG(shape.Component, newComponentNodeID);
+            assembleGraphPG(shape.Pose, newPosesNodeID);
+            assembleGraphPG(shape.Orientation, newOrientationNodeID);
+
+            createEdge(parent, newLPGnodeID);
+            createEdge(newLPGnodeID, newComponentNodeID);
+            createEdge(newLPGnodeID, newPosesNodeID);
+            createEdge(newLPGnodeID, newOrientationNodeID);
+        }
+
+        private void assembleGraphMov(GestureMovement movement, string parent)
+        {
+            string newMPGnodeID = createNode("MvG"); // Movement Predicate Group
+            string newMainPlanenodeID = createNode("MAINPLANE"); // Movement Predicate Group
+            string newTrajnodeID = createNode("TRAJECTORY"); // Movement Predicate Group
+            string newDirnodeID = createNode("DIRECTION"); // Movement Predicate Group
+
+            assembleGraphVG(movement.Variables, newMPGnodeID); // Movement Variables
+            assembleGraphSG(movement.Points, newMPGnodeID); // Movement Spatiotemporals
+            assembleGraphP(movement.MainPlane, newMainPlanenodeID); // Movement Main Plane
+            assembleGraphPG(movement.Trajectories, newTrajnodeID); // Movement Trajectories
+            assembleGraphPG(movement.Directions, newDirnodeID); // Movement Directions
+
+            createEdge(parent, newMPGnodeID);
+            createEdge(newMPGnodeID, newMainPlanenodeID);
+            createEdge(newMPGnodeID, newTrajnodeID);
+            createEdge(newMPGnodeID, newDirnodeID);
+        }
+
+        private string createNode(string nodeName)
+        {
+            JObject newNode = new JObject();
+            newNode["id"] = assignNodeID();
+            newNode["name"] = nodeName;
+            g_Nodes.Add(newNode);
+
+            return (string)newNode["id"];
+        }
+
+        private void createEdge(string sourceNodeName, string targetNodeName)
+        {
+            JObject newEdge = new JObject();
+            newEdge["source"] = sourceNodeName;
+            newEdge["target"] = targetNodeName;
+            g_Edges.Add(newEdge);
+        }
+
+        private string assignNodeID()
+        {
+            g_NodeID++;
+            return ConstantValues.g_Node + g_NodeID.ToString();
         }
     }
 }

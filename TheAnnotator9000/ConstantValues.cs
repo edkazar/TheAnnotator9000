@@ -30,6 +30,7 @@ namespace TheAnnotator9000
         public const string g_SpatiotempString = "Spatiotemp";
         public const string g_MappingString = "Mapping";
         public const string g_LocString = "Loc";
+        public const string g_Node = "Node";
 
         ConstantValues()
         {
